@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SPIKE Duffle Shuffle — Checklist</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --green: #2d6a2d; --green-light: #e8f5e8; --green-mid: #4a9e4a;
+    --red: #a32d2d; --red-mid: #d04040;
+    --tan: #f5f0e8; --tan-dark: #e8e0d0;
+    --brown: #6b5a3e; --brown-dark: #3d2e1a;
+    --ink: #1a1a1a; --ink-mid: #444; --ink-light: #888;
+    --border: #c8bfaa; --white: #fefcf8;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--tan); color: var(--ink); min-height: 100vh; }
+
+  .page-header { background: var(--brown-dark); color: #f5f0e8; padding: 20px 24px; display: flex; align-items: center; gap: 16px; }
+  .header-logo { width: 48px; height: 48px; background: var(--tan-dark); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .header-title { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: #c8bfaa; margin-bottom: 2px; }
+  .header-main { font-size: 22px; font-weight: 600; }
+
+  .container { max-width: 640px; margin: 0 auto; padding: 24px 16px 60px; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .card { background: var(--white); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 16px; }
+  .card h2 { font-size: 15px; font-weight: 600; margin-bottom: 16px; color: var(--brown-dark); }
+  .fgroup { display: grid; gap: 12px; }
+  .field label { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-light); display: block; margin-bottom: 5px; }
+  .field input { width: 100%; padding: 10px 12px; font-size: 15px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: 8px; background: var(--tan); color: var(--ink); outline: none; transition: border-color .15s; }
+  .field input:focus { border-color: var(--brown); }
+  .slabel { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-light); margin-bottom: 8px; display: block; }
+
+  /* crew */
+  .crew-btns { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+  .crew-btn { padding: 14px 8px 10px; border-radius: 10px; border: 2px solid transparent; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; transition: all .15s; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .crew-btn .sw { width: 26px; height: 26px; border-radius: 50%; }
+  .crew-btn.c-blue   { background:#e8f0fb; color:#1a3a7a; } .crew-btn.c-blue   .sw { background:#2563eb; }
+  .crew-btn.c-yellow { background:#fefce8; color:#7a5c00; } .crew-btn.c-yellow .sw { background:#eab308; }
+  .crew-btn.c-red    { background:#fef2f2; color:#7a1a1a; } .crew-btn.c-red    .sw { background:#dc2626; }
+  .crew-btn.c-orange { background:#fff7ed; color:#7a3500; } .crew-btn.c-orange .sw { background:#f97316; }
+  .crew-btn:hover { transform: translateY(-2px); box-shadow: 0 3px 10px rgba(0,0,0,.12); }
+  .crew-btn.sel-blue   { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.2); }
+  .crew-btn.sel-yellow { border-color:#ca8a04; box-shadow:0 0 0 3px rgba(202,138,4,.2); }
+  .crew-btn.sel-red    { border-color:#dc2626; box-shadow:0 0 0 3px rgba(220,38,38,.2); }
+  .crew-btn.sel-orange { border-color:#f97316; box-shadow:0 0 0 3px rgba(249,115,22,.2); }
+
+  /* med */
+  .med-yn { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .med-yn-btn { padding: 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: 8px; background: var(--tan); color: var(--ink-mid); cursor: pointer; transition: all .15s; font-weight: 500; }
+  .med-yn-btn:hover { border-color: var(--brown); }
+  .med-yn-btn.ay { background: var(--green-light); border-color: var(--green); color: var(--green); }
+  .med-yn-btn.an { background: #f0ebe3; border-color: var(--brown); color: var(--brown-dark); }
+  .med-details { display: none; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+  .med-entry { background: var(--tan); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 12px; position: relative; }
+  .med-entry-num { font-size: 11px; font-weight: 600; color: var(--brown-dark); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .rm-med { position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--ink-light); cursor: pointer; font-size: 20px; line-height: 1; padding: 2px 6px; border-radius: 4px; transition: color .15s; }
+  .rm-med:hover { color: var(--red); }
+  .bottle-check { display: flex; align-items: center; gap: 8px; background: #fff8e8; border: 1px solid #e0c96b; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; cursor: pointer; }
+  .bottle-check input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--brown-dark); flex-shrink: 0; cursor: pointer; }
+  .bottle-check span { font-size: 13px; color: #6b4e00; font-weight: 500; }
+  .mf { margin-bottom: 10px; }
+  .mf label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-light); display: block; margin-bottom: 4px; }
+  .mf input, .mf textarea { width: 100%; padding: 8px 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: 7px; background: var(--white); color: var(--ink); outline: none; }
+  .mf input:focus, .mf textarea:focus { border-color: var(--brown); }
+  .mf textarea { resize: vertical; min-height: 64px; line-height: 1.5; }
+  .mf-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .add-med { width: 100%; padding: 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: transparent; border: 1px dashed var(--border); border-radius: 8px; color: var(--brown); cursor: pointer; transition: all .15s; font-weight: 500; }
+  .add-med:hover { background: var(--tan-dark); border-color: var(--brown); }
+
+  .start-btn { width: 100%; padding: 14px; font-size: 16px; font-weight: 600; font-family: 'DM Sans', sans-serif; background: var(--brown-dark); color: var(--tan); border: none; border-radius: 10px; cursor: pointer; letter-spacing: .02em; transition: opacity .15s; }
+  .start-btn:hover { opacity: .85; }
+
+  /* checklist */
+  .prog-wrap { margin-bottom: 20px; }
+  .prog-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+  .plbl { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-light); }
+  .prog-track { height: 5px; background: var(--tan-dark); border-radius: 3px; overflow: hidden; }
+  .prog-fill { height: 100%; background: var(--brown); border-radius: 3px; transition: width .4s ease; }
+  .top-badges { margin-bottom: 12px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .crew-chip { display: inline-flex; align-items: center; gap: 5px; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 3px 10px 3px 6px; border-radius: 20px; background: var(--tan-dark); }
+  .crew-chip-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .cat-badge { display: inline-block; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; padding: 3px 10px; background: var(--tan-dark); color: var(--brown); border-radius: 20px; }
+  .item-card { background: var(--white); border: 1px solid var(--border); border-radius: 14px; padding: 28px 24px 24px; margin-bottom: 14px; }
+  .item-name { font-size: 22px; font-weight: 600; line-height: 1.3; margin-bottom: 8px; color: var(--ink); }
+  .item-borrow { font-size: 12px; color: var(--brown); font-family: 'DM Mono', monospace; margin-bottom: 20px; }
+  .btn-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .btn-yes { background: var(--green); color: #fff; border: none; border-radius: 10px; padding: 22px 16px; font-size: 30px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all .12s; line-height: 1; }
+  .btn-yes .bl { font-size: 13px; font-weight: 500; display: block; margin-top: 5px; letter-spacing: .04em; }
+  .btn-no  { background: var(--red); color: #fff; border: none; border-radius: 10px; padding: 22px 16px; font-size: 30px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all .12s; line-height: 1; }
+  .btn-no  .bl { font-size: 13px; font-weight: 500; display: block; margin-top: 5px; letter-spacing: .04em; }
+  .btn-borrow { background: #1d4ed8; color: #fff; border: none; border-radius: 10px; padding: 14px 16px; font-size: 18px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-weight: 600; transition: all .12s; line-height: 1; margin-top: 10px; width: 100%; }
+  .btn-borrow .bl { font-size: 12px; font-weight: 500; display: block; margin-top: 4px; letter-spacing: .04em; }
+  .btn-yes:hover   { background: var(--green-mid); transform: translateY(-1px); }
+  .btn-no:hover    { background: var(--red-mid);   transform: translateY(-1px); }
+  .btn-borrow:hover { background: #2563eb; transform: translateY(-1px); }
+  .btn-yes:active, .btn-no:active, .btn-borrow:active { transform: scale(.97); }
+  .btn-yes.sel    { outline: 3px solid var(--green-mid); outline-offset: 2px; }
+  .btn-no.sel     { outline: 3px solid var(--red-mid);   outline-offset: 2px; }
+  .btn-borrow.sel { outline: 3px solid #2563eb; outline-offset: 2px; }
+  .nav-row { display: flex; gap: 8px; align-items: center; }
+  .back-btn { padding: 9px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--ink-mid); cursor: pointer; transition: all .15s; }
+  .back-btn:hover { background: var(--tan-dark); }
+  .skip-btn { margin-left: auto; padding: 9px 16px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: transparent; border: 1px solid var(--border); border-radius: 8px; color: var(--ink-light); cursor: pointer; }
+  .skip-btn:hover { color: var(--ink); }
+
+  /* summary */
+  .sum-header { margin-bottom: 20px; }
+  .sum-header h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .sum-meta { font-size: 13px; color: var(--ink-light); font-family: 'DM Mono', monospace; }
+  .stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+  .stat-box { background: var(--white); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-n { font-size: 28px; font-weight: 600; }
+  .stat-n.g { color: var(--green); } .stat-n.r { color: var(--red); }
+  .stat-l { font-size: 11px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-light); margin-top: 2px; }
+  .sum-sec { margin-bottom: 8px; }
+  .sec-head { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--brown); padding: 6px 0 4px; border-bottom: 1px solid var(--tan-dark); margin-bottom: 4px; }
+  .sum-row { display: flex; align-items: center; gap: 10px; padding: 7px 4px; border-bottom: 1px solid var(--tan-dark); font-size: 14px; }
+  .sdot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .sdot.y { background: var(--green); } .sdot.n { background: var(--red); } .sdot.b { background: #2563eb; }
+  .export-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; font-family: 'DM Sans', sans-serif; background: var(--brown-dark); color: var(--tan); border: none; border-radius: 10px; cursor: pointer; margin-top: 20px; margin-bottom: 10px; transition: opacity .15s; }
+  .export-btn:hover { opacity: .85; }
+  .export-hint { font-size: 12px; color: var(--ink-light); text-align: center; margin-bottom: 10px; font-style: italic; }
+  .restart-btn { width: 100%; padding: 11px; font-size: 14px; font-family: 'DM Sans', sans-serif; background: transparent; border: 1px solid var(--border); border-radius: 10px; color: var(--ink-mid); cursor: pointer; }
+  .restart-btn:hover { background: var(--tan-dark); }
+
+  /* med summary card on summary screen */
+  .med-sum-card { background: #fff8e8; border: 1.5px solid #e0c96b; border-radius: 12px; padding: 18px 20px; margin-top: 16px; }
+  .med-sum-title { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #6b4e00; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+  .med-sum-entry { border: 1px solid #e0c96b; border-radius: 8px; background: #fffdf5; padding: 12px 14px; margin-bottom: 10px; }
+  .med-sum-entry:last-child { margin-bottom: 0; }
+  .med-sum-name { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+  .med-sum-row { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 6px; }
+  .med-sum-field { flex: 1; min-width: 120px; }
+  .med-sum-field-label { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-light); margin-bottom: 2px; }
+  .med-sum-field-value { font-size: 14px; font-weight: 500; color: var(--ink); }
+  .med-sum-sched-label { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-light); margin-bottom: 2px; margin-top: 6px; }
+  .med-sum-sched-value { font-size: 13px; color: var(--ink-mid); line-height: 1.5; }
+  .bottle-badge-ok  { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; background:#e8f5e8; color:#2d6a2d; border:1px solid #4a9e4a; }
+  .bottle-badge-no  { display:inline-block; font-size:11px; font-weight:600; padding:2px 8px; border-radius:20px; background:#fdf0f0; color:#a32d2d; border:1px solid #d04040; }
+
+  @media (max-width: 420px) {
+    .btn-yes, .btn-no { padding: 16px 10px; font-size: 24px; }
+    .item-name { font-size: 19px; }
+    .crew-btns { grid-template-columns: repeat(2,1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-logo">🏔</div>
+  <div>
+    <div class="header-title">Twin Rivers Charter School</div>
+    <div class="header-main">SPIKE Duffle Shuffle</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- INFO -->
+  <div id="screen-info" class="screen active">
+    <div class="card">
+      <h2>Student Info</h2>
+      <div class="fgroup">
+        <div class="field"><label>Student Name</label><input type="text" id="student-name" placeholder="Full name"></div>
+        <div class="field"><label>Date</label><input type="date" id="date"></div>
+        <div class="field"><label>Duffle Bag #</label><input type="text" id="duffle" placeholder="e.g. 7"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Crew</h2>
+      <span class="slabel">Select crew color</span>
+      <div class="crew-btns">
+        <button class="crew-btn c-blue"   id="crew-Blue"   onclick="selectCrew('Blue')"  ><div class="sw"></div>Blue</button>
+        <button class="crew-btn c-yellow" id="crew-Yellow" onclick="selectCrew('Yellow')"><div class="sw"></div>Yellow</button>
+        <button class="crew-btn c-red"    id="crew-Red"    onclick="selectCrew('Red')"   ><div class="sw"></div>Red</button>
+        <button class="crew-btn c-orange" id="crew-Orange" onclick="selectCrew('Orange')"><div class="sw"></div>Orange</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Medications</h2>
+      <span class="slabel">Does this student have medications to check in?</span>
+      <div class="med-yn">
+        <button class="med-yn-btn" id="med-yes-btn" onclick="setMed(true)">Yes</button>
+        <button class="med-yn-btn" id="med-no-btn"  onclick="setMed(false)">No</button>
+      </div>
+      <div class="med-details" id="med-details">
+        <div id="med-list"></div>
+        <button class="add-med" onclick="addMed()">+ Add another medication</button>
+      </div>
+    </div>
+
+    <button class="start-btn" onclick="startChecklist()">Start Gear Check →</button>
+  </div>
+
+  <!-- CHECKLIST -->
+  <div id="screen-item" class="screen">
+    <div class="prog-wrap">
+      <div class="prog-top">
+        <span class="plbl" id="step-label">Item 1 of 31</span>
+        <span class="plbl" id="pct-label">0%</span>
+      </div>
+      <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="top-badges">
+      <span class="crew-chip" id="crew-chip" style="display:none;">
+        <span class="crew-chip-dot" id="crew-chip-dot"></span>
+        <span id="crew-chip-text"></span>&nbsp;Crew
+      </span>
+      <span class="cat-badge" id="cat-badge">—</span>
+    </div>
+    <div class="item-card">
+      <div class="item-name" id="item-name">—</div>
+      <div class="item-borrow" id="item-borrow" style="display:none;">◆ Available to borrow from TRCS</div>
+      <div class="btn-pair">
+        <button class="btn-yes" id="btn-yes" onclick="answer('yes')">✓<span class="bl">Got it</span></button>
+        <button class="btn-no"  id="btn-no"  onclick="answer('no')">✗<span class="bl">Missing</span></button>
+      </div>
+      <button class="btn-borrow" id="btn-borrow" onclick="answer('borrowed')">◆<span class="bl">Borrowed from TRCS</span></button>
+    </div>
+    <div class="nav-row">
+      <button class="back-btn" onclick="goBack()">← Back</button>
+      <button class="skip-btn" onclick="skipItem()">Skip →</button>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div id="screen-summary" class="screen">
+    <div class="sum-header">
+      <h2>Checklist Complete</h2>
+      <div class="sum-meta" id="summary-meta">—</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-n g" id="stat-yes">0</div><div class="stat-l">Packed</div></div>
+      <div class="stat-box"><div class="stat-n r" id="stat-no">0</div><div class="stat-l">Missing</div></div>
+      <div class="stat-box"><div class="stat-n" id="stat-borrow" style="color:#1d4ed8;">0</div><div class="stat-l">Borrowed</div></div>
+    </div>
+    <div id="summary-body"></div>
+    <div id="med-summary-section"></div>
+    <button class="export-btn" onclick="exportPDF()">⬇ Save as PDF</button>
+    <p class="export-hint">A print dialog will open — choose "Save as PDF" and name the file as prompted.</p>
+    <button class="restart-btn" onclick="restart()">Start Over</button>
+  </div>
+
+</div>
+
+<script>
+const ITEMS = [
+  { cat:"Clothing & Layers", name:"Close-toed hiking boots", borrow:false },
+  { cat:"Clothing & Layers", name:"Water shoes or old tennis shoes", borrow:false },
+  { cat:"Clothing & Layers", name:"Wool socks (at least 3 pairs)", borrow:false },
+  { cat:"Clothing & Layers", name:"Underwear (4 pairs)", borrow:false },
+  { cat:"Clothing & Layers", name:"Non-cotton long underwear", borrow:false },
+  { cat:"Clothing & Layers", name:"Lightweight hiking pants", borrow:false },
+  { cat:"Clothing & Layers", name:"Lightweight rain pants", borrow:false },
+  { cat:"Clothing & Layers", name:"2 T-shirts", borrow:false },
+  { cat:"Clothing & Layers", name:"Fleece jacket", borrow:false },
+  { cat:"Clothing & Layers", name:"Rain jacket / shell", borrow:false },
+  { cat:"Clothing & Layers", name:"Warm gloves", borrow:false },
+  { cat:"Clothing & Layers", name:"Warm hat & sun hat", borrow:false },
+  { cat:"Sleep & Camp", name:"Sleeping bag", borrow:true },
+  { cat:"Sleep & Camp", name:"Compression stuff sack", borrow:false },
+  { cat:"Sleep & Camp", name:"Sleeping pad", borrow:true },
+  { cat:"Sleep & Camp", name:"Pillow", borrow:false },
+  { cat:"Personal Items", name:"Headlamp / flashlight w/ batteries", borrow:true },
+  { cat:"Personal Items", name:"Airtight water bottle", borrow:false },
+  { cat:"Personal Items", name:"Toiletries (toothbrush, paste, etc.)", borrow:false },
+  { cat:"Work Project Gear", name:"8\" high leather work boots", borrow:true },
+  { cat:"Work Project Gear", name:"Long-sleeved collared button-down shirt", borrow:false },
+  { cat:"Work Project Gear", name:"Sturdy jeans or work pants", borrow:false },
+  { cat:"Work Project Gear", name:"Leather work gloves", borrow:false },
+  { cat:"Work Project Gear", name:"Warm jacket", borrow:true },
+  { cat:"Work Project Gear", name:"Hard hat", borrow:true },
+  { cat:"Work Project Gear", name:"Rain gear", borrow:true },
+  { cat:"Recommended Extras", name:"Extra batteries", borrow:false },
+  { cat:"Recommended Extras", name:"Sunscreen / bug spray", borrow:false },
+  { cat:"Recommended Extras", name:"Small day pack", borrow:false },
+  { cat:"Recommended Extras", name:"Camp towel", borrow:false },
+  { cat:"Recommended Extras", name:"Book / cards / journal", borrow:false },
+];
+
+const CREWS = {
+  Blue:   { main:'#2563eb', light:'#dbeafe', dark:'#1e3a8a', text:'#1e3a8a', border:'#93c5fd' },
+  Yellow: { main:'#eab308', light:'#fef9c3', dark:'#713f12', text:'#713f12', border:'#fde047' },
+  Red:    { main:'#dc2626', light:'#fee2e2', dark:'#7f1d1d', text:'#7f1d1d', border:'#fca5a5' },
+  Orange: { main:'#f97316', light:'#ffedd5', dark:'#7c2d12', text:'#7c2d12', border:'#fdba74' },
+};
+
+let answers = new Array(ITEMS.length).fill(null);
+let current = 0;
+let medYes  = null;
+let crew    = null;
+let medId   = 0;
+
+document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+function selectCrew(c) {
+  crew = c;
+  ['Blue','Yellow','Red','Orange'].forEach(x => {
+    document.getElementById('crew-'+x).className = 'crew-btn c-'+x.toLowerCase()+(x===c?' sel-'+x.toLowerCase():'');
+  });
+}
+
+function setMed(val) {
+  medYes = val;
+  document.getElementById('med-yes-btn').className = 'med-yn-btn'+(val?' ay':'');
+  document.getElementById('med-no-btn').className  = 'med-yn-btn'+(!val?' an':'');
+  document.getElementById('med-details').style.display = val ? 'block' : 'none';
+  if (val && document.getElementById('med-list').children.length === 0) addMed();
+}
+
+function addMed() {
+  medId++;
+  const id = 'med'+medId;
+  const n  = document.getElementById('med-list').children.length + 1;
+  const div = document.createElement('div');
+  div.className = 'med-entry'; div.id = id;
+  div.innerHTML =
+    '<div class="med-entry-num">Medication '+n+'</div>'+
+    '<button class="rm-med" onclick="removeMed(\''+id+'\')">×</button>'+
+    '<label class="bottle-check"><input type="checkbox" id="'+id+'-bottle" checked><span>Confirmed in original prescription bottle</span></label>'+
+    '<div class="mf"><label>Medication name</label><input type="text" id="'+id+'-name" placeholder="e.g. Amoxicillin 250mg"></div>'+
+    '<div class="mf-row">'+
+      '<div class="mf"><label>Number of pills checked in</label><input type="number" id="'+id+'-pills" placeholder="e.g. 14" min="1"></div>'+
+      '<div class="mf"><label>Dose per administration</label><input type="text" id="'+id+'-dose" placeholder="e.g. 1 pill"></div>'+
+    '</div>'+
+    '<div class="mf"><label>Schedule — when &amp; how often</label><textarea id="'+id+'-sched" placeholder="e.g. Every morning with breakfast and every night before bed"></textarea></div>';
+  document.getElementById('med-list').appendChild(div);
+  renumberMeds();
+}
+
+function removeMed(id) { const el=document.getElementById(id); if(el)el.remove(); renumberMeds(); }
+function renumberMeds() {
+  document.querySelectorAll('#med-list .med-entry').forEach((el,i)=>{
+    el.querySelector('.med-entry-num').textContent='Medication '+(i+1);
+  });
+}
+function getMeds() {
+  return Array.from(document.querySelectorAll('#med-list .med-entry')).map(el=>{
+    const id=el.id;
+    return {
+      name:  (document.getElementById(id+'-name') ||{value:''}).value,
+      pills: (document.getElementById(id+'-pills')||{value:''}).value,
+      dose:  (document.getElementById(id+'-dose') ||{value:''}).value,
+      sched: (document.getElementById(id+'-sched')||{value:''}).value,
+      bottle:(document.getElementById(id+'-bottle')||{checked:false}).checked,
+    };
+  });
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startChecklist() {
+  current=0; answers=new Array(ITEMS.length).fill(null);
+  showScreen('screen-item');
+  if (crew) {
+    document.getElementById('crew-chip').style.display='inline-flex';
+    document.getElementById('crew-chip-dot').style.background=CREWS[crew].main;
+    document.getElementById('crew-chip-text').textContent=crew;
+  }
+  renderItem();
+}
+
+function renderItem() {
+  const item=ITEMS[current];
+  const pct=Math.round((current/ITEMS.length)*100);
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('step-label').textContent='Item '+(current+1)+' of '+ITEMS.length;
+  document.getElementById('pct-label').textContent=pct+'%';
+  document.getElementById('cat-badge').textContent=item.cat;
+  document.getElementById('item-name').textContent=item.name;
+  document.getElementById('item-borrow').style.display=item.borrow?'block':'none';
+  const ans=answers[current];
+  document.getElementById('btn-yes').className='btn-yes'+(ans==='yes'?' sel':'');
+  document.getElementById('btn-no').className='btn-no'+(ans==='no'?' sel':'');
+  document.getElementById('btn-borrow').className='btn-borrow'+(ans==='borrowed'?' sel':'');
+}
+
+function answer(val) {
+  answers[current]=val;
+  document.getElementById('btn-yes').className='btn-yes'+(val==='yes'?' sel':'');
+  document.getElementById('btn-no').className='btn-no'+(val==='no'?' sel':'');
+  document.getElementById('btn-borrow').className='btn-borrow'+(val==='borrowed'?' sel':'');
+  setTimeout(()=>{ if(current<ITEMS.length-1){current++;renderItem();}else{showSummary();} },320);
+}
+function skipItem(){ if(current<ITEMS.length-1){current++;renderItem();}else{showSummary();} }
+function goBack(){ if(current>0){current--;renderItem();}else{showScreen('screen-info');} }
+
+function showSummary() {
+  showScreen('screen-summary');
+  const student=document.getElementById('student-name').value||'Student';
+  const duffle=document.getElementById('duffle').value||'—';
+  const date=document.getElementById('date').value||'—';
+  document.getElementById('summary-meta').textContent=student+' · '+(crew||'—')+' Crew · Duffle #'+duffle+' · '+date;
+  document.getElementById('stat-yes').textContent=answers.filter(a=>a==='yes'||a==='borrowed').length;
+  document.getElementById('stat-no').textContent=answers.filter(a=>a==='no').length;
+  document.getElementById('stat-borrow').textContent=answers.filter(a=>a==='borrowed').length;
+
+  const cats=[...new Set(ITEMS.map(i=>i.cat))];
+  let html='';
+  cats.forEach(cat=>{
+    html+='<div class="sum-sec"><div class="sec-head">'+cat+'</div>';
+    ITEMS.forEach((item,idx)=>{
+      if(item.cat!==cat)return;
+      const got=answers[idx];
+      const dotClass = got==='yes'?'y': got==='no'?'n': got==='borrowed'?'b': '';
+      const tag = got==='borrowed' ? '<span style="font-size:11px;color:#1d4ed8;font-family:monospace;margin-left:auto;">◆ borrowed</span>' : '';
+      html+='<div class="sum-row"><div class="sdot '+dotClass+'"></div><span>'+item.name+'</span>'+tag+'</div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('summary-body').innerHTML=html;
+
+  // med summary card
+  const medSec = document.getElementById('med-summary-section');
+  if (medYes) {
+    const meds = getMeds();
+    if (meds.length > 0) {
+      let cards = meds.map((m,i) => {
+        const bottleBadge = m.bottle
+          ? '<span class="bottle-badge-ok">✓ Original bottle</span>'
+          : '<span class="bottle-badge-no">✗ Not in original bottle</span>';
+        return `<div class="med-sum-entry">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+            <div class="med-sum-name">${m.name||'(unnamed)'}</div>
+            ${bottleBadge}
+          </div>
+          <div class="med-sum-row">
+            <div class="med-sum-field">
+              <div class="med-sum-field-label">Pills checked in</div>
+              <div class="med-sum-field-value">${m.pills||'—'}</div>
+            </div>
+            <div class="med-sum-field">
+              <div class="med-sum-field-label">Dose per administration</div>
+              <div class="med-sum-field-value">${m.dose||'—'}</div>
+            </div>
+          </div>
+          <div class="med-sum-sched-label">Schedule</div>
+          <div class="med-sum-sched-value">${m.sched||'(none entered)'}</div>
+        </div>`;
+      }).join('');
+      medSec.innerHTML = `<div class="med-sum-card">
+        <div class="med-sum-title">⚕ Medications (${meds.length})</div>
+        ${cards}
+      </div>`;
+    } else {
+      medSec.innerHTML = `<div class="med-sum-card"><div class="med-sum-title">⚕ Medications flagged — no details entered</div></div>`;
+    }
+  } else {
+    medSec.innerHTML = '';
+  }
+}
+
+function restart() {
+  current=0; answers=new Array(ITEMS.length).fill(null);
+  medYes=null; crew=null; medId=0;
+  document.getElementById('med-yes-btn').className='med-yn-btn';
+  document.getElementById('med-no-btn').className='med-yn-btn';
+  document.getElementById('med-details').style.display='none';
+  document.getElementById('med-list').innerHTML='';
+  ['Blue','Yellow','Red','Orange'].forEach(c=>{
+    document.getElementById('crew-'+c).className='crew-btn c-'+c.toLowerCase();
+  });
+  showScreen('screen-info');
+}
+
+/* ===================== PDF EXPORT ===================== */
+function exportPDF() {
+  const student = document.getElementById('student-name').value || 'Student';
+  const duffle  = document.getElementById('duffle').value || '—';
+  const date    = document.getElementById('date').value || '';
+  const meds    = medYes ? getMeds() : [];
+  const c       = crew ? CREWS[crew] : null;
+  const crewName = crew || '—';
+
+  const yesCount = answers.filter(a=>a==='yes'||a==='borrowed').length;
+  const noCount  = answers.filter(a=>a==='no').length;
+
+  /* ---- build gear table rows ---- */
+  const cats = [...new Set(ITEMS.map(i=>i.cat))];
+  let gearRows = '';
+  cats.forEach(cat => {
+    gearRows += `<tr class="cat-row"><td colspan="2">${cat.toUpperCase()}</td></tr>`;
+    ITEMS.forEach((item,idx) => {
+      if (item.cat !== cat) return;
+      const got = answers[idx];
+      const mark = got==='yes'
+        ? '<span class="check-yes">✓</span>'
+        : got==='no'
+          ? '<span class="check-no">✗</span>'
+          : got==='borrowed'
+            ? '<span class="check-borrow">◆</span>'
+            : '<span class="check-skip">—</span>';
+      gearRows += `<tr><td>${item.name}${item.borrow?' <span class="borrow-mark">◆</span>':''}</td><td class="check-cell">${mark}</td></tr>`;
+    });
+  });
+
+  /* ---- build crew lead notes table: sort into correct columns ---- */
+  const forgotItems   = [];
+  const needItems     = [];
+  const borrowedItems = [];
+  ITEMS.forEach((item,idx) => {
+    if      (answers[idx]==='borrowed') borrowedItems.push(item.name);
+    else if (answers[idx]==='no')       needItems.push(item.name);
+  });
+  const maxRows = Math.max(forgotItems.length, needItems.length, borrowedItems.length, 6);
+  let crewRows = '';
+  for (let i=0; i<maxRows; i++) {
+    crewRows += `<tr><td>${forgotItems[i]||''}</td><td>${needItems[i]||''}</td><td>${borrowedItems[i]||''}</td></tr>`;
+  }
+
+  /* ---- build med summary for page 1 ---- */
+  let medSummarySection = '';
+  if (medYes && meds.length > 0) {
+    const medInlineCards = meds.map((m,i) => {
+      const bottleTag = m.bottle
+        ? '<span class="med-inline-bottle-ok">✓ Original bottle</span>'
+        : '<span class="med-inline-bottle-no">✗ Not in original bottle — FLAG</span>';
+      return `<div class="med-inline-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+          <div class="med-inline-name">${m.name||'(unnamed)'}</div>
+          ${bottleTag}
+        </div>
+        <div class="med-inline-grid">
+          <div class="med-inline-field"><div class="med-inline-lbl">Pills checked in</div><div class="med-inline-val">${m.pills||'—'}</div></div>
+          <div class="med-inline-field"><div class="med-inline-lbl">Dose per admin.</div><div class="med-inline-val">${m.dose||'—'}</div></div>
+        </div>
+        <div class="med-inline-sched-lbl">Schedule</div>
+        <div class="med-inline-sched-val">${m.sched||'(none entered)'}</div>
+      </div>`;
+    }).join('');
+    medSummarySection = `
+      <div class="section-head">Medications (${meds.length})</div>
+      <div class="med-sum-section">
+        <div class="med-sum-section-title">⚕ Medication check-in summary — full details on page 2</div>
+        ${medInlineCards}
+      </div>`;
+  }
+
+  /* ---- build medication standalone page ---- */
+  let medPage = '';
+  if (medYes && meds.length > 0) {
+    let medCards = '';
+    meds.forEach((m,i) => {
+      const bottleOk = m.bottle;
+      medCards += `
+        <div class="med-card">
+          <div class="med-card-header">
+            <span class="med-num">Medication ${i+1}</span>
+            <span class="med-bottle ${bottleOk?'bottle-ok':'bottle-no'}">${bottleOk?'✓ In original prescription bottle':'✗ NOT in original bottle — FLAG'}</span>
+          </div>
+          <div class="med-name">${m.name || '(name not entered)'}</div>
+          <div class="med-details-grid">
+            <div class="med-detail-box">
+              <div class="med-detail-label">Pills checked in</div>
+              <div class="med-detail-value">${m.pills || '—'}</div>
+            </div>
+            <div class="med-detail-box">
+              <div class="med-detail-label">Dose per administration</div>
+              <div class="med-detail-value">${m.dose || '—'}</div>
+            </div>
+          </div>
+          <div class="med-sched-label">Schedule</div>
+          <div class="med-sched-value">${m.sched || '(no schedule entered)'}</div>
+        </div>`;
+    });
+
+    medPage = `
+      <div class="page-break"></div>
+      <div class="pdf-page med-page" style="${c?'border:8px solid '+c.main+';':'' }">
+        ${c ? `<div class="crew-corner-strip" style="background:${c.main};"></div>` : ''}
+        <div class="pdf-header" style="${c?'background:'+c.main+';':'background:#3d2e1a;'}">
+          <div class="pdf-header-school">Twin Rivers Charter School</div>
+          <div class="pdf-header-title">SPIKE — Medication Check-In</div>
+        </div>
+
+        <div class="med-page-student-bar" style="${c?'background:'+c.light+';border:2px solid '+c.border+';':'background:#f5f0e8;border:1px solid #c8bfaa;'}">
+          <div class="med-page-student-name" style="${c?'color:'+c.dark+';':'color:#3d2e1a;'}">${student}</div>
+          <div class="med-page-meta" style="${c?'color:'+c.text+';':''}">
+            <span class="crew-pill" style="${c?'background:'+c.main+';color:#fff;':''}">${crewName} Crew</span>
+            &nbsp; Duffle #${duffle} &nbsp; ${date}
+          </div>
+        </div>
+
+        <div class="med-notice">All medications must be in the original prescription bottle at time of check-in.</div>
+
+        ${medCards}
+
+        <div class="sig-row">
+          <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Staff receiving medications</div></div>
+          <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Student / Parent / Guardian</div></div>
+        </div>
+      </div>`;
+  }
+
+  /* ---- assemble full HTML ---- */
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>${student.replace(/\s+/g,'').toLowerCase()}</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family: Arial, Helvetica, sans-serif; background:#fff; color:#1a1a1a; }
+
+  .pdf-page {
+    width: 100%;
+    padding: 0;
+    position: relative;
+    ${c ? 'border: 8px solid '+c.main+';' : 'border: 3px solid #3d2e1a;'}
+    margin-bottom: 0;
+    overflow: hidden;
+  }
+
+  /* thick color bars on left and right edges */
+  .side-bar-left, .side-bar-right {
+    position: fixed;
+    top: 0; bottom: 0;
+    width: 10px;
+    ${c ? 'background:'+c.main+';' : 'background:#3d2e1a;'}
+    z-index: 100;
+  }
+  .side-bar-left  { left: 0; }
+  .side-bar-right { right: 0; }
+
+  .pdf-header {
+    ${c ? 'background:'+c.main+';' : 'background:#3d2e1a;'}
+    color: #fff;
+    padding: 14px 20px 12px;
+  }
+  .pdf-header-school { font-size: 9px; letter-spacing: .12em; text-transform: uppercase; opacity: .85; margin-bottom: 2px; }
+  .pdf-header-title  { font-size: 18px; font-weight: bold; }
+
+  /* ---- HERO STUDENT BLOCK ---- */
+  .student-hero {
+    ${c ? 'background:'+c.light+';border-bottom:4px solid '+c.main+';' : 'background:#f5f0e8;border-bottom:3px solid #3d2e1a;'}
+    padding: 18px 20px 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .student-hero-left {}
+  .student-label {
+    font-size: 9px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    ${c ? 'color:'+c.text+';' : 'color:#6b5a3e;'}
+    font-weight: bold;
+    margin-bottom: 3px;
+  }
+  .student-name {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -.01em;
+    ${c ? 'color:'+c.dark+';' : 'color:#3d2e1a;'}
+    line-height: 1;
+  }
+  .student-meta-row {
+    margin-top: 6px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .meta-chip {
+    font-size: 11px;
+    padding: 3px 10px;
+    border-radius: 20px;
+    ${c ? 'background:'+c.main+';color:#fff;' : 'background:#3d2e1a;color:#f5f0e8;'}
+    font-weight: bold;
+    letter-spacing: .03em;
+  }
+  .meta-date {
+    font-size: 11px;
+    ${c ? 'color:'+c.text+';' : 'color:#6b5a3e;'}
+  }
+
+  /* DUFFLE badge */
+  .duffle-hero {
+    text-align: center;
+    ${c ? 'background:'+c.main+';' : 'background:#3d2e1a;'}
+    color: #fff;
+    border-radius: 10px;
+    padding: 10px 18px;
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+  .duffle-label { font-size: 8px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; margin-bottom: 2px; }
+  .duffle-num   { font-size: 36px; font-weight: 900; line-height: 1; }
+
+  /* med flag */
+  .med-flag {
+    margin: 0 20px 0;
+    padding: 7px 12px;
+    ${c ? 'background:'+c.light+';border:1.5px solid '+c.border+';color:'+c.dark+';' : 'background:#fff8e8;border:1.5px solid #e0c96b;color:#6b4e00;'}
+    border-radius: 6px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* stats */
+  .stats-row {
+    display: flex;
+    gap: 10px;
+    padding: 12px 20px;
+    border-bottom: 1px solid #e0d8cc;
+  }
+  .stat-box { background:#f5f0e8; border-radius:6px; padding:8px 14px; display:flex; align-items:baseline; gap:6px; }
+  .stat-n   { font-size:22px; font-weight:900; }
+  .stat-n.g { color:#2d6a2d; }
+  .stat-n.r { color:#a32d2d; }
+  .stat-l   { font-size:9px; text-transform:uppercase; letter-spacing:.07em; color:#888; }
+
+  /* gear table */
+  .gear-table-wrap { padding: 0 20px 14px; }
+  table { width:100%; border-collapse:collapse; font-size:11px; }
+  .gear-table-wrap table { margin-top: 12px; }
+  th { background:#3d2e1a; color:#f5f0e8; padding:5px 8px; font-size:9px; text-align:left; letter-spacing:.06em; text-transform:uppercase; }
+  td { padding:4px 8px; border-bottom:1px solid #e8e0d0; }
+  tr.cat-row td { background:#f0ede4; font-weight:bold; font-size:9px; letter-spacing:.07em; color:#3d2e1a; padding:5px 8px; }
+  .check-cell { text-align:center; width:40px; }
+  .check-yes    { color:#2d6a2d; font-weight:900; font-size:14px; }
+  .check-no     { color:#a32d2d; font-weight:900; font-size:14px; }
+  .check-borrow { color:#1d4ed8; font-weight:900; font-size:14px; }
+  .check-skip   { color:#aaa; font-size:12px; }
+  .borrow-mark  { color:#6b5a3e; font-size:9px; }
+
+  /* crew lead notes */
+  .section-head {
+    font-size:9px; font-weight:bold; letter-spacing:.08em; text-transform:uppercase;
+    color:#3d2e1a; padding:10px 20px 6px;
+  }
+  .notes-table-wrap { padding: 0 20px 14px; }
+  .notes-table-wrap table th { background:#e8e0d0; color:#3d2e1a; }
+
+  /* sig */
+  .sig-row { display:flex; gap:40px; padding:16px 20px 20px; }
+  .sig-block { flex:1; }
+  .sig-line  { border-bottom:1px solid #888; margin-bottom:4px; height:24px; }
+  .sig-label { font-size:9px; color:#888; text-transform:uppercase; letter-spacing:.06em; }
+
+  /* med summary on page 1 */
+  .med-sum-section { margin:0 20px 14px; padding:14px; background:#fffbf0; border:1.5px solid #e0c96b; border-radius:8px; page-break-inside:avoid; }
+  .med-sum-section-title { font-size:9px; font-weight:bold; letter-spacing:.09em; text-transform:uppercase; color:#6b4e00; margin-bottom:10px; }
+  .med-inline-card { border:1px solid #e0c96b; border-radius:6px; background:#fff; padding:8px 10px; margin-bottom:8px; page-break-inside:avoid; }
+  .med-inline-card:last-child { margin-bottom:0; }
+  .med-inline-name { font-size:13px; font-weight:bold; color:#1a1a1a; margin-bottom:5px; }
+  .med-inline-grid { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:4px; }
+  .med-inline-field { flex:1; min-width:80px; }
+  .med-inline-lbl { font-size:7px; text-transform:uppercase; letter-spacing:.08em; color:#888; margin-bottom:1px; }
+  .med-inline-val { font-size:11px; font-weight:bold; color:#1a1a1a; }
+  .med-inline-sched-lbl { font-size:7px; text-transform:uppercase; letter-spacing:.08em; color:#888; margin-bottom:1px; margin-top:4px; }
+  .med-inline-sched-val { font-size:10px; color:#333; line-height:1.4; }
+  .med-inline-bottle-ok { font-size:8px; font-weight:bold; color:#2d6a2d; background:#e8f5e8; padding:1px 6px; border-radius:10px; display:inline-block; }
+  .med-inline-bottle-no { font-size:8px; font-weight:bold; color:#a32d2d; background:#fdf0f0; padding:1px 6px; border-radius:10px; display:inline-block; }
+
+  .footnote { font-size:8px; color:#aaa; padding:0 20px 12px; font-style:italic; }
+
+  /* PAGE BREAK */
+  .page-break { page-break-before:always; break-before:page; }
+
+  /* MED PAGE */
+  .med-page { margin-top:0; }
+  .med-page-student-bar {
+    padding:14px 20px;
+    margin: 0;
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+  }
+  .med-page-student-name { font-size:26px; font-weight:900; }
+  .med-page-meta { font-size:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .crew-pill { padding:3px 12px; border-radius:20px; font-weight:bold; font-size:11px; }
+  .med-notice {
+    margin:10px 20px;
+    padding:8px 12px;
+    background:#fff8e8; border:1px solid #e0c96b; border-radius:6px;
+    font-size:10px; font-weight:bold; color:#6b4e00; letter-spacing:.03em;
+  }
+  .med-card {
+    margin:10px 20px;
+    border:1px solid #c8bfaa;
+    border-radius:8px;
+    overflow:hidden;
+    page-break-inside:avoid;
+  }
+  .med-card-header {
+    background:#f0ede4;
+    padding:8px 14px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid #c8bfaa;
+  }
+  .med-num { font-size:9px; font-weight:bold; letter-spacing:.08em; text-transform:uppercase; color:#3d2e1a; }
+  .med-bottle { font-size:10px; font-weight:bold; }
+  .bottle-ok  { color:#2d6a2d; }
+  .bottle-no  { color:#a32d2d; }
+  .med-name { font-size:18px; font-weight:900; padding:10px 14px 6px; color:#1a1a1a; }
+  .med-details-grid { display:flex; gap:0; border-top:1px solid #e8e0d0; border-bottom:1px solid #e8e0d0; }
+  .med-detail-box { flex:1; padding:8px 14px; border-right:1px solid #e8e0d0; }
+  .med-detail-box:last-child { border-right:none; }
+  .med-detail-label { font-size:8px; text-transform:uppercase; letter-spacing:.08em; color:#888; margin-bottom:3px; }
+  .med-detail-value { font-size:16px; font-weight:900; color:#1a1a1a; }
+  .med-sched-label { font-size:8px; text-transform:uppercase; letter-spacing:.08em; color:#888; padding:8px 14px 2px; }
+  .med-sched-value { font-size:11px; padding:0 14px 12px; color:#333; line-height:1.5; }
+
+  @media print {
+    html, body { margin:0; padding:0; }
+    .side-bar-left, .side-bar-right { position:fixed; }
+    .pdf-page { border-width: ${c ? '8px' : '3px'}; page-break-after:always; break-after:page; }
+    .pdf-page:last-child { page-break-after:auto; break-after:auto; }
+    .page-break { page-break-before:always; break-before:page; }
+  }
+</style>
+</head>
+<body>
+
+<div class="side-bar-left"></div>
+<div class="side-bar-right"></div>
+
+<!-- PAGE 1: GEAR CHECKLIST -->
+<div class="pdf-page">
+
+  <div class="pdf-header" style="${c?'background:'+c.main+';':'background:#3d2e1a;'}">
+    <div class="pdf-header-school">Twin Rivers Charter School</div>
+    <div class="pdf-header-title">SPIKE Duffle Shuffle — Gear Packing Checklist</div>
+  </div>
+
+  <div class="student-hero">
+    <div class="student-hero-left">
+      <div class="student-label">Student</div>
+      <div class="student-name">${student}</div>
+      <div class="student-meta-row">
+        <span class="meta-chip">${crewName} Crew</span>
+        <span class="meta-date">${date}</span>
+      </div>
+    </div>
+    <div class="duffle-hero">
+      <div class="duffle-label">Duffle</div>
+      <div class="duffle-num">#${duffle}</div>
+    </div>
+  </div>
+
+  ${medYes ? `<div class="med-flag">⚕ Medications checked in — see page 2 for full details</div>` : ''}
+
+  <div class="stats-row">
+    <div class="stat-box"><span class="stat-n g">${yesCount}</span><span class="stat-l">Packed</span></div>
+    <div class="stat-box"><span class="stat-n r">${noCount}</span><span class="stat-l">Missing</span></div>
+    <div class="stat-box"><span class="stat-n" style="color:#1d4ed8;">${answers.filter(a=>a==='borrowed').length}</span><span class="stat-l">Borrowed</span></div>
+  </div>
+
+  <div class="gear-table-wrap">
+    <table>
+      <thead><tr>
+        <th>Item</th>
+        <th style="text-align:center;width:40px;">Packed?</th>
+      </tr></thead>
+      <tbody>${gearRows}</tbody>
+    </table>
+  </div>
+
+  <div class="section-head">Crew Lead Notes</div>
+  <div class="notes-table-wrap">
+    <table>
+      <thead><tr>
+        <th>Forgot at Home</th>
+        <th>Need to Acquire</th>
+        <th>Borrowed from TRCS</th>
+      </tr></thead>
+      <tbody>${crewRows}</tbody>
+    </table>
+  </div>
+
+  ${medSummarySection}
+
+  <div class="sig-row">
+    <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Crew Lead</div></div>
+    <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Student</div></div>
+  </div>
+
+  <div class="footnote">◆ Available to borrow from TRCS &nbsp;·&nbsp; Generated ${new Date().toLocaleDateString()}</div>
+</div>
+
+${medPage}
+
+</body>
+</html>`;
+
+  /* ---- open print window ---- */
+  const win = window.open('', '_blank');
+  if (!win) { alert('Pop-up blocked! Please allow pop-ups for this page and try again.'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(()=>{
+    win.document.title = student.replace(/\s+/g,'').toLowerCase();
+    win.print();
+  }, 600);
+}
+</script>
+</body>
+</html>
