@@ -44,8 +44,10 @@
     width: 48px; height: 48px;
     background: rgba(255,255,255,0.2);
     border-radius: 50%; display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
+    font-size: 22px; flex-shrink: 0; cursor: pointer; transition: transform .15s, background .15s;
   }
+  .header-logo:hover { background: rgba(255,255,255,0.35); transform: scale(1.1); }
+  .header-logo:active { transform: scale(0.95); }
   .header-title { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,0.7); margin-bottom: 2px; }
   .header-main { font-size: 22px; font-weight: 600; }
 
@@ -303,7 +305,48 @@
   }
   .prohib-confirm-btn:hover { opacity: .85; }
 
-  /* ===== ROLE SELECTION ===== */
+  .home-live-count {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 600; color: var(--crew-text);
+    opacity: .75; margin-bottom: 20px;
+    transition: color .45s;
+  }
+  .home-live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #22c55e; flex-shrink: 0;
+    animation: live-blink 1.8s ease-in-out infinite;
+  }
+  @keyframes live-blink {
+    0%,100% { opacity: 1; transform: scale(1); }
+    50%      { opacity: .4; transform: scale(0.75); }
+  }
+
+  .home-leaderboard {
+    flex-shrink: 0; width: 200px;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 12px; padding: 10px 12px;
+    align-self: center;
+    transition: background .45s, border-color .45s;
+  }
+  .leaderboard-title {
+    font-size: 10px; font-weight: 700; letter-spacing: .09em;
+    text-transform: uppercase; color: var(--crew-text);
+    opacity: .6; margin-bottom: 8px; text-align: center;
+    transition: color .45s;
+  }
+  .leaderboard-rows { display: grid; gap: 3px; }
+  .lb-row {
+    display: flex; align-items: center; gap: 6px;
+    padding: 5px 7px; border-radius: 7px;
+    transition: background .3s;
+    background: transparent;
+  }
+  .lb-row.rank-1 { background: #fffbeb; }
+  .lb-row.rank-2 { background: #f8fafc; }
+  .lb-row.rank-3 { background: #fff7f0; }
+  .lb-medal { font-size: 13px; flex-shrink: 0; width: 18px; text-align: center; }
+  .lb-name  { font-size: 12px; font-weight: 600; color: var(--ink); flex: 1; text-align: left; }
+  .lb-count { font-size: 10px; font-weight: 600; color: var(--ink-light); font-family: 'DM Mono', monospace; }
   .role-hero { min-height: calc(100vh - 130px); display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 40px 0 60px; text-align:center; }
   .role-title { font-size: 28px; font-weight: 800; color: var(--crew-main); margin-bottom: 6px; transition: color .45s; }
   .role-sub   { font-size: 14px; color: var(--ink-light); margin-bottom: 36px; }
@@ -411,13 +454,16 @@
   #screen-home { padding: 0; }
   .home-hero {
     min-height: calc(100vh - 73px);
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    text-align: center; padding: 40px 24px 60px;
+    display: flex; flex-direction: row; align-items: center;
+    justify-content: center; gap: 20px;
+    padding: 32px 20px 48px; flex-wrap: wrap;
+  }
+  .home-main {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center; flex: 1; min-width: 200px;
   }
   .home-mountain {
-    font-size: 72px; line-height: 1;
-    margin-bottom: 16px;
+    font-size: 64px; line-height: 1; margin-bottom: 12px;
     animation: home-float 3s ease-in-out infinite;
   }
   @keyframes home-float {
@@ -425,38 +471,33 @@
     50%      { transform: translateY(-10px); }
   }
   .home-school {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-    color: var(--crew-text); opacity: .7; margin-bottom: 12px;
+    font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--crew-text); opacity: .7; margin-bottom: 10px;
     transition: color .45s ease;
   }
   .home-title {
-    font-size: 52px; font-weight: 900; line-height: 1.05;
-    color: var(--crew-main); letter-spacing: -.02em;
-    margin-bottom: 10px;
+    font-size: 46px; font-weight: 900; line-height: 1.05;
+    color: var(--crew-main); letter-spacing: -.02em; margin-bottom: 8px;
     transition: color .45s ease;
   }
   .home-tagline {
-    font-size: 18px; color: var(--crew-text); opacity: .6;
-    margin-bottom: 36px; font-style: italic;
-    transition: color .45s ease;
+    font-size: 16px; color: var(--crew-text); opacity: .6;
+    margin-bottom: 28px; font-style: italic; transition: color .45s ease;
   }
   .home-start-btn {
-    padding: 18px 48px; font-size: 18px; font-weight: 700;
-    font-family: 'DM Sans', sans-serif;
-    background: var(--crew-main); color: #fff;
-    border: none; border-radius: 50px; cursor: pointer;
-    letter-spacing: .02em; margin-bottom: 24px;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+    padding: 16px 44px; font-size: 17px; font-weight: 700;
+    font-family: 'DM Sans', sans-serif; background: var(--crew-main); color: #fff;
+    border: none; border-radius: 50px; cursor: pointer; letter-spacing: .02em;
+    margin-bottom: 16px; box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     transition: transform .15s, opacity .15s, background-color .45s ease;
   }
   .home-start-btn:hover  { transform: translateY(-2px); opacity: .9; }
   .home-start-btn:active { transform: scale(0.97); }
   .home-items-preview {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center;
-    font-size: 12px; color: var(--crew-text); opacity: .5;
+    display: flex; align-items: center; gap: 6px; flex-wrap: wrap; justify-content: center;
+    font-size: 11px; color: var(--crew-text); opacity: .45;
     font-family: 'DM Mono', monospace; letter-spacing: .04em;
-    transition: color .45s ease;
+    transition: color .45s ease; margin-top: 10px;
   }
   .home-dot { opacity: .4; }
 
@@ -520,7 +561,7 @@
 <body>
 
 <div class="page-header">
-  <div class="header-logo">🏔</div>
+  <div class="header-logo" onclick="restart()" title="Return to home">🏔</div>
   <div>
     <div class="header-title">Twin Rivers Charter School</div>
     <div class="header-main">SPIKE Duffle Shuffle</div>
@@ -533,17 +574,27 @@
   <!-- HOME SCREEN -->
   <div id="screen-home" class="screen active">
     <div class="home-hero">
-      <div class="home-mountain">🏔</div>
-      <div class="home-school">Twin Rivers Charter School</div>
-      <h1 class="home-title">SPIKE<br>Duffle Shuffle</h1>
-      <p class="home-tagline">Start shuffling now</p>
-      <button class="home-start-btn" onclick="showScreen('screen-role')">Get Started →</button>
-      <div class="home-items-preview">
-        <span>31 gear items</span>
-        <span class="home-dot">·</span>
-        <span>Medication check-in</span>
-        <span class="home-dot">·</span>
-        <span>Prohibited items</span>
+      <div class="home-main">
+        <div class="home-mountain">🏔</div>
+        <div class="home-school">Twin Rivers Charter School</div>
+        <h1 class="home-title">SPIKE<br>Duffle Shuffle</h1>
+        <p class="home-tagline">Start shuffling now</p>
+        <button class="home-start-btn" onclick="showScreen('screen-role')">Get Started →</button>
+        <div class="home-live-count">
+          <span class="home-live-dot"></span>
+          <span id="live-count">247,892</span> users shuffling now
+        </div>
+        <div class="home-items-preview">
+          <span>31 gear items</span>
+          <span class="home-dot">·</span>
+          <span>Medication check-in</span>
+          <span class="home-dot">·</span>
+          <span>Prohibited items</span>
+        </div>
+      </div>
+      <div class="home-leaderboard">
+        <div class="leaderboard-title">🏆 Top Shufflers</div>
+        <div class="leaderboard-rows" id="leaderboard-rows"></div>
       </div>
     </div>
   </div>
@@ -780,6 +831,57 @@ let medId   = 0;
 let userRole = null; // 'teacher' | 'student'
 
 document.getElementById('date').value = new Date().toISOString().split('T')[0];
+
+// animate fake live user count
+let liveCount = 247892;
+function tickLiveCount() {
+  const delta = Math.floor(Math.random() * 11) - 3;
+  liveCount = Math.max(245000, Math.min(252000, liveCount + delta));
+  const el = document.getElementById('live-count');
+  if (el) el.textContent = liveCount.toLocaleString();
+  setTimeout(tickLiveCount, 1600 + Math.random() * 1200);
+}
+tickLiveCount();
+
+// leaderboard — 10 users jostling for position
+const MEDALS = ['🥇','🥈','🥉','4','5','6','7','8','9','10'];
+let lbUsers = [
+  { name: 'David',      count: 84312 },
+  { name: 'Casey',      count: 84287 },
+  { name: 'Avery',      count: 84251 },
+  { name: 'Alexandria', count: 84198 },
+  { name: 'Abi',        count: 84174 },
+  { name: 'Eider',      count: 84143 },
+  { name: 'Lauren',     count: 84119 },
+  { name: "Ma'am",      count: 84087 },
+  { name: 'Grace',      count: 84062 },
+  { name: 'Brandi',     count: 84031 },
+];
+
+function renderLeaderboard() {
+  const el = document.getElementById('leaderboard-rows');
+  if (!el) return;
+  const sorted = [...lbUsers].sort((a,b) => b.count - a.count);
+  el.innerHTML = sorted.map((u, i) => {
+    const medal = i < 3 ? ['🥇','🥈','🥉'][i] : `<span style="font-size:10px;color:#aaa;">${i+1}</span>`;
+    return `<div class="lb-row rank-${Math.min(i+1,4)}">
+      <span class="lb-medal">${medal}</span>
+      <span class="lb-name">${u.name}</span>
+      <span class="lb-count">${u.count.toLocaleString()}</span>
+    </div>`;
+  }).join('');
+}
+
+function tickLeaderboard() {
+  lbUsers = lbUsers.map(u => ({
+    ...u,
+    count: u.count + Math.floor(Math.random() * 5) // 0–4 per tick, tight enough to swap often
+  }));
+  renderLeaderboard();
+  setTimeout(tickLeaderboard, 500 + Math.random() * 400); // faster: ~0.5–0.9s
+}
+renderLeaderboard();
+tickLeaderboard();
 
 /* ---- ROLE SELECTION ---- */
 function selectRole(role) {
