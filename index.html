@@ -346,7 +346,7 @@ body {
     <input id="i-date" value="April 16, 2026" style="width:115px;" oninput="updateField('.meta-date',this.value)">
     <div class="tb-sep"></div>
     <label>City / Location</label>
-    <input id="i-city" value="Flaming Gorge, Utah" style="width:145px;" oninput="updateField('.meta-city',this.value)">
+    <input id="i-city" value="Eugene, OR" style="width:145px;" oninput="updateField('.meta-city',this.value)">
     <div class="tb-sep"></div>
     <label>Edition</label>
     <input id="i-ed" value="Vol. 1  No. 1" style="width:90px;" oninput="updateField('.meta-ed',this.value)">
@@ -377,7 +377,7 @@ function ce(cls, inner, extra) { return `<div class="${cls}" contenteditable="tr
 
 function getMast() { return document.getElementById('i-mast').value || 'Twin Rivers Times'; }
 function getDate() { return document.getElementById('i-date').value || 'April 16, 2026'; }
-function getCity() { return document.getElementById('i-city').value || 'Flaming Gorge, Utah'; }
+function getCity() { return document.getElementById('i-city').value || 'Eugene, OR'; }
 function getEd()   { return document.getElementById('i-ed').value   || 'Vol. 1 No. 1'; }
 
 function updateField(sel, val) {
