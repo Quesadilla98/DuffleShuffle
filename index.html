@@ -402,6 +402,15 @@ body.placing-photo .place-hint { opacity: 1; }
     <label>Edition</label>
     <input id="i-ed" value="Vol. 1  No. 1" style="width:90px;" oninput="updateField('.meta-ed',this.value)">
     <div class="tb-sep"></div>
+    <label>Text Size</label>
+    <select id="i-textsize" onchange="applyTextSize(this.value)" style="width:90px;">
+      <option value="xs">Extra Small</option>
+      <option value="sm">Small</option>
+      <option value="md" selected>Medium</option>
+      <option value="lg">Large</option>
+      <option value="xl">Extra Large</option>
+    </select>
+    <div class="tb-sep"></div>
     <button class="btn-action" id="btn-add-photo" onclick="startPhotoPlace()" title="Click then click on the page to place a photo box">📷 Add Photo</button>
     <div class="toolbar-right">
       <button class="btn-action" onclick="document.execCommand('undo')">↩ Undo</button>
@@ -419,6 +428,24 @@ const L1 = "The confluence of the Green and Colorado Rivers lies 32 miles southw
 const L2 = "John Wesley Powell had an expedition in 1869 to explore areas of what he called the Great Unknown of the Great Canyons in the American West. He first spent most of his time exploring the canyons of the Green and Colorado rivers in Utah. This expedition represents an amazing achievement for Powell and his team at the time. Before leaving Utah territory, Powell wrote that they had reached a historical point.";
 const L3 = "The Green River begins in the Wind River Mountains of Wyoming and travels more than 730 miles southward through Utah before meeting the Colorado. This junction marks one of the most historically and ecologically significant points in the American West, lying within Canyonlands National Park. Reservoir levels have reached a 30-year high due to record snowpack in the Rockies this winter season.";
 const L4 = "Officials at the Bureau of Reclamation confirmed that the dam is operating within normal parameters despite elevated water levels. Engineers have been monitoring the spillway gates around the clock as inflows from the upper basin continue to exceed seasonal averages by a wide margin. Communities downstream have been placed on flood watch as a precautionary measure.";
+
+// Text size scale multipliers applied to .art-body font-size (base 10.5px)
+const TEXT_SIZES = {
+  xs: 0.8,
+  sm: 0.9,
+  md: 1.0,
+  lg: 1.15,
+  xl: 1.3
+};
+
+function applyTextSize(size) {
+  const mult = TEXT_SIZES[size] || 1.0;
+  const basePx = 10.5 * mult;
+  const page = document.getElementById('page');
+  page.querySelectorAll('.art-body').forEach(el => {
+    el.style.fontSize = basePx.toFixed(1) + 'px';
+  });
+}
 
 function e(tag, attrs, inner) {
   let s = `<${tag}`;
@@ -925,6 +952,8 @@ function load(name, btn) {
   document.querySelectorAll('.tpl-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   applyDropCaps();
+  // Re-apply current text size after loading a new template
+  applyTextSize(document.getElementById('i-textsize').value);
 }
 
 load('art1', document.querySelector('.tpl-btn'));
@@ -1068,7 +1097,6 @@ async function exportBothSizes() {
     status.textContent = msg;
   }
 
-  // Capture at a fixed height (condensed) — for 9x12 output
   async function captureCondensed() {
     const wrap = document.createElement('div');
     wrap.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:1200px;z-index:-9999;pointer-events:none;overflow:hidden;';
@@ -1093,34 +1121,25 @@ async function exportBothSizes() {
     });
 
     document.body.removeChild(wrap);
-    return result; // 900×1200
+    return result;
   }
 
-  // Capture at full natural height — for 12x18 output
   async function captureFull() {
-    // Temporarily remove fixed height constraints so the page expands to full content
     const wrap = document.createElement('div');
     wrap.style.cssText = 'position:fixed;left:0;top:0;width:900px;z-index:-9999;pointer-events:none;overflow:visible;';
     const clone = page.cloneNode(true);
-    // Remove height/overflow constraints so all content renders
     clone.style.cssText = 'position:absolute;left:0;top:0;width:900px;height:auto;min-height:1200px;margin:0;padding:36px 44px 36px;box-shadow:none;overflow:visible;';
-    // Remove overflow:hidden from inner containers
     clone.querySelectorAll('*').forEach(el => {
       const s = el.style;
       if (s.overflow === 'hidden' || s.overflow === 'auto') s.overflow = 'visible';
       if (s.maxHeight) s.maxHeight = 'none';
-      if (s.height && s.height !== 'auto' && !el.classList.contains('img-box') && !el.classList.contains('comic-zone')) {
-        // preserve explicit fixed heights on image boxes, but free layout containers
-      }
     });
-    // Also override classes that clip content
     const style = document.createElement('style');
     style.textContent = `.page-body,.page-grow,.grid,.gc{overflow:visible!important;height:auto!important;max-height:none!important;flex:unset!important;min-height:0!important;}`;
     clone.appendChild(style);
     wrap.appendChild(clone);
     document.body.appendChild(wrap);
 
-    // Let the DOM settle so height is calculated
     await new Promise(r => setTimeout(r, 80));
     const fullH = Math.max(clone.scrollHeight, clone.offsetHeight, 1200);
     wrap.style.height = fullH + 'px';
@@ -1141,10 +1160,9 @@ async function exportBothSizes() {
     });
 
     document.body.removeChild(wrap);
-    return result; // 900×fullH
+    return result;
   }
 
-  // Scale src canvas to exactly fill outW×outH (stretch to fill, no letterboxing)
   function scaleFill(src, outW, outH) {
     const out = document.createElement('canvas');
     out.width  = outW;
@@ -1161,14 +1179,12 @@ async function exportBothSizes() {
     const condensed = await captureCondensed();
 
     setProgress(42, 'Building 9×12 export...');
-    // 9×12 @ 150dpi = 1350×1800 — scale the condensed 900×1200 capture to fill exactly
     const canvas9x12 = scaleFill(condensed, 1350, 1800);
 
     setProgress(58, 'Capturing full page (12×18)...');
     const full = await captureFull();
 
     setProgress(78, 'Building 12×18 export...');
-    // 12×18 @ 150dpi = 1800×2700 — scale the full-height capture to fill exactly
     const canvas12x18 = scaleFill(full, 1800, 2700);
 
     setProgress(88, 'Building ZIP...');
