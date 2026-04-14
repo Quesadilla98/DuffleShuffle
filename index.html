@@ -208,7 +208,7 @@ body {
   overflow: hidden;
 }
 .img-box input { position: absolute; opacity: 0; inset: 0; cursor: pointer; width: 100%; height: 100%; }
-.img-box img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; inset: 0; filter: grayscale(100%); }
+.img-box img { width: 100%; height: 100%; object-fit: cover; display: block; position: absolute; inset: 0; }
 .img-box .img-hint { pointer-events: none; z-index: 1; text-align: center; padding: 4px; }
 .img-box .img-hint svg { display: block; margin: 0 auto 4px; opacity: 0.5; }
 
@@ -227,7 +227,7 @@ body {
   overflow: hidden;
 }
 .comic-zone input { position: absolute; opacity: 0; inset: 0; cursor: pointer; width: 100%; height: 100%; }
-.comic-zone img { width: 100%; height: 100%; object-fit: contain; display: block; position: absolute; inset: 0; filter: grayscale(100%); }
+.comic-zone img { width: 100%; height: 100%; object-fit: contain; display: block; position: absolute; inset: 0; }
 .comic-zone .cz-hint { pointer-events: none; z-index: 1; text-align: center; }
 
 .page-footer { border-top: 2px solid var(--rule); padding-top: 4px; font-size: 8.5px; font-family: Arial, sans-serif; display: flex; justify-content: space-between; color: var(--muted); }
@@ -259,7 +259,7 @@ body.placing-photo .place-hint { opacity: 1; }
 .placed-photo .ph-inner {
   width: 100%; height: 100%; overflow: hidden; position: relative;
 }
-.placed-photo img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; filter: grayscale(100%); }
+.placed-photo img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
 .placed-photo .ph-hint {
   width: 100%; height: 100%; display: flex; flex-direction: column;
   align-items: center; justify-content: center;
@@ -520,7 +520,7 @@ function loadImg(ev, container) {
     let img = container.querySelector('img');
     if (!img) {
       img = document.createElement('img');
-      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(100%);z-index:0;pointer-events:none;';
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;z-index:0;pointer-events:none;';
       container.insertBefore(img, container.firstChild);
     }
     img.src = e2.target.result;
@@ -1031,7 +1031,7 @@ function loadPlacedImg(ev, input) {
     let img = inner.querySelector('img');
     if (!img) {
       img = document.createElement('img');
-      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;filter:grayscale(100%);';
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;';
       inner.insertBefore(img, input);
     }
     img.src = e2.target.result;
