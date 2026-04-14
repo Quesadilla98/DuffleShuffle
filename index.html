@@ -451,26 +451,34 @@ function article(size, head, body1, body2, byline) {
 
 const templates = {
 
+// Article I — 3 Column: single article spread across three equal columns
 art1: ()=> wrap(
   header('News'),
   `${ce('banner-head','Dam Project Approved Amid Record Water Levels')}
   ${ce('banner-sub','Officials say infrastructure upgrade will protect thousands of downstream residents')}
   <hr class="rule">
+  ${ce('kicker','Breaking News')}
+  ${ce('art-head lg','Historic Vote Seals the Dam\'s Fate')}
+  ${ce('art-byline','By Jane Waters | Staff Reporter | '+getCity())}
+  <hr class="rule" style="margin:4px 0;">
   <div class="grid" style="grid-template-columns:1fr 1fr 1fr; flex:1; align-items:stretch;">
-    <div class="gc">${article('','Historic Vote Seals Dam\'s Fate',L1,L2+' '+L3+' '+L4,'Jane Waters')}</div>
-    <div class="gc">${article('sm','Engineers Warn of Aging Infrastructure',L3,L4+' '+L1,'Tom Rivers')}
-      <div class="pullquote" contenteditable="true">"The dam has held for 60 years — but not without a cost to future generations."</div>
-      <div class="art-body" contenteditable="true"><p>${L2}</p></div>
+    <div class="gc">
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div>
     </div>
     <div class="gc">
       ${imgBox(145,'Photo')}
       ${ce('caption','Workers inspect the northern face of Flaming Gorge Dam. Photo: U.S. Bureau of Reclamation')}
-      ${article('sm','Community Divided on Cost',L2,L4+' '+L1,'Alex Stone')}
+      <div class="art-body" contenteditable="true"><p>${L3}</p></div>
+    </div>
+    <div class="gc">
+      <div class="pullquote" contenteditable="true">"The dam has held for 60 years — but not without a cost to future generations."</div>
+      <div class="art-body" contenteditable="true"><p>${L4}</p><p>${L1}</p></div>
     </div>
   </div>`,
   footer(2)
 ),
 
+// Article II — Lead+Side: single article with wide lead column and narrow sidebar of continued text
 art2: ()=> wrap(
   header('Features'),
   `${ce('banner-head','Life at the Water\'s Edge')}
@@ -478,38 +486,47 @@ art2: ()=> wrap(
   <hr class="rule">
   <div class="grid" style="grid-template-columns:1.5fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${imgBox(260,'Main Feature Photo')}
+      ${ce('kicker','Feature')}
+      ${ce('art-head lg','The River That Built the West')}
+      ${ce('art-byline','By M. Siewney | Photo Correspondent | '+getCity())}
+      ${imgBox(240,'Main Feature Photo')}
       ${ce('caption','The Green River winds past canyon walls carved over millennia. Photo: M. Siewney, 2026')}
-      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p></div>
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div>
     </div>
     <div class="gc">
-      ${article('sm','Reservoir Levels at 30-Year High',L3,L4,'')}
-      <hr class="rule">
+      <div class="pullquote" contenteditable="true">"Protecting the flow, preserving the future."</div>
       ${imgBox(130,'Secondary Photo')}
       ${ce('caption','High-water marks visible on canyon walls near the dam.')}
-      <div class="pullquote" contenteditable="true">"Protecting the flow, preserving the future."</div>
-      <div class="art-body" contenteditable="true"><p>${L4}</p><p>${L1}</p></div>
+      <div class="art-body" contenteditable="true"><p>${L3}</p><p>${L4}</p><p>${L1}</p></div>
     </div>
   </div>`,
   footer(3)
 ),
 
+// Article III — Banner+3: single article with full-width photo above three text columns
 art3: ()=> wrap(
   header('Sunday Edition'),
   `${ce('banner-head','The Great Dam of the American West: A Century of Power')}
   ${ce('banner-sub','From New Deal dream to modern engineering marvel — the full story of Flaming Gorge')}
   <hr class="rule">
-  ${imgBox(200,'Wide Banner Photo — Full Width')}
+  ${ce('kicker','Long Read')}
+  ${ce('art-head lg','One Hundred Years in the Making')}
+  ${ce('art-byline','By the Editorial Staff | '+getCity())}
+  ${imgBox(190,'Wide Banner Photo — Full Width')}
   ${ce('caption','Aerial view of Flaming Gorge Reservoir stretching 91 miles into the canyon on a clear spring morning.')}
   <hr class="rule">
   <div class="grid" style="grid-template-columns:1fr 1fr 1fr; flex:1; align-items:stretch;">
-    <div class="gc">${article('','The Vision',L1,L2+' '+L3,'')}</div>
-    <div class="gc">${article('','The Construction',L3,L4+' '+L1,'')}</div>
-    <div class="gc">${article('','The Legacy',L2,L3+' '+L4,'')}</div>
+    <div class="gc"><div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div></div>
+    <div class="gc"><div class="art-body" contenteditable="true"><p>${L3}</p><p>${L4}</p></div></div>
+    <div class="gc">
+      <div class="pullquote" contenteditable="true">"What we built here was not just a dam — it was a declaration of what this nation could do."</div>
+      <div class="art-body" contenteditable="true"><p>${L1}</p></div>
+    </div>
   </div>`,
   footer(4)
 ),
 
+// Article IV — Feature: single article with large photo in lead column and continued text in sidebar
 art4: ()=> wrap(
   header('In Depth'),
   `<hr class="rule">
@@ -518,161 +535,170 @@ art4: ()=> wrap(
       ${ce('kicker','Investigative Report')}
       ${ce('art-head lg','Inside the Fight Over Flaming Gorge Water Rights')}
       ${ce('art-byline','By Maria Sandoval | Special Correspondent | '+getCity())}
-      ${imgBox(200,'Feature Photograph')}
+      ${imgBox(210,'Feature Photograph')}
       ${ce('caption','The dam\'s spillway gates, last opened in 2011 during peak runoff season.')}
-      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p><p>${L4}</p></div>
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p></div>
     </div>
     <div class="gc">
-      ${article('sm','Who Owns the River?',L4,L1,'')}
-      <hr class="rule">
       <div class="pullquote" contenteditable="true">"Water is the oil of the 21st century — and we are running dry."</div>
-      <hr class="rule">
-      ${article('sm','States Sue Over Allocations',L2,L3,'')}
       ${imgBox(130,'Portrait Photo')}
-      ${ce('caption','Dam director Carl Webb addresses reporters.')}
-      <div class="art-body" contenteditable="true"><p>${L4}</p></div>
+      ${ce('caption','Dam director Carl Webb addresses reporters at the Monday briefing.')}
+      <div class="art-body" contenteditable="true"><p>${L4}</p><p>${L1}</p><p>${L2}</p></div>
     </div>
   </div>`,
   footer(2)
 ),
 
+// Article V — Photo Lead: full-width photo up top, then single article in two columns below
 art5: ()=> wrap(
   header('Breaking News'),
   `${ce('banner-head','Flash Flood Watch Issued for Lower Basin')}
   ${ce('banner-sub','Authorities urge evacuation of riverside communities as dam reaches 98% capacity')}
   <hr class="rule">
-  ${imgBox(240,'Breaking News Photo — Full Width')}
+  ${imgBox(230,'Breaking News Photo — Full Width')}
   ${ce('caption','Murky floodwaters approach the main access road below the dam, Sunday evening. Photo: AP / Dale Brooks')}
   <hr class="rule">
+  ${ce('kicker','Developing Story')}
+  ${ce('art-head lg','Evacuation Orders Issued for Three Counties')}
+  ${ce('art-byline','By Dale Brooks | Staff Reporter | '+getCity())}
   <div class="grid" style="grid-template-columns:1fr 1fr; flex:1; align-items:stretch;">
-    <div class="gc">${article('','Evacuation Orders Issued',L1,L2+' '+L3,'')}</div>
-    <div class="gc">${article('','Emergency Response Teams Deploy',L3,L4+' '+L2,'')}</div>
-  </div>
-  <div class="pullquote" contenteditable="true">"Leave now. Do not wait until morning." — Sheriff Dale Brooks, Green River County</div>`,
+    <div class="gc">
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div>
+    </div>
+    <div class="gc">
+      <div class="pullquote" contenteditable="true">"Leave now. Do not wait until morning." — Sheriff Dale Brooks, Green River County</div>
+      <div class="art-body" contenteditable="true"><p>${L3}</p><p>${L4}</p></div>
+    </div>
+  </div>`,
   footer(2)
 ),
 
+// Article VI — 2 Column: single article split evenly across two columns
 art6: ()=> wrap(
   header('Local News'),
   `${ce('banner-head','Town Council Approves Dam Renovation Budget')}
   <hr class="rule">
+  ${ce('kicker','Local Government')}
+  ${ce('art-head lg','$42 Million Plan Moves Forward After Contentious Vote')}
+  ${ce('art-byline','By Alex Stone | City Hall Reporter | '+getCity())}
+  <hr class="rule" style="margin:4px 0;">
   <div class="grid" style="grid-template-columns:1fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${article('','$42 Million Plan Moves Forward',L1,L2+' '+L3,'')}
-      ${imgBox(170,'Council Meeting Photo')}
+      ${imgBox(175,'Council Meeting Photo')}
       ${ce('caption','Council members vote 5-2 in favor of the renovation package at Tuesday\'s session.')}
-      <div class="art-body" contenteditable="true"><p>${L4}</p></div>
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div>
     </div>
     <div class="gc">
       <div class="pullquote" contenteditable="true">"This investment will protect our community for generations to come."</div>
-      ${article('','Opposition Voices Concerns',L3,L4+' '+L1,'')}
-      <hr class="rule">
-      ${article('sm','Timeline: Key Dates in Dam History',L2,L3,'')}
+      <div class="art-body" contenteditable="true"><p>${L3}</p><p>${L4}</p><p>${L1}</p></div>
     </div>
   </div>`,
   footer(3)
 ),
 
+// Article VII — Big Photo: dominant full-width photo, single article below
 art7: ()=> wrap(
   header('Photography'),
   `${ce('banner-head','Breathtaking Views From the Gorge')}
   <hr class="rule">
-  ${imgBox(310,'Full-Width Panoramic Photo')}
-  ${ce('caption','Looking south from the dam\'s observation deck at golden hour. Photo: M. Siewney, 2026 — Confluence of the Green and Colorado Rivers, Utah 84532')}
+  ${imgBox(305,'Full-Width Panoramic Photo')}
+  ${ce('caption','Looking south from the dam\'s observation deck at golden hour. Photo: M. Siewney, 2026 — Confluence of the Green and Colorado Rivers, Utah')}
   <hr class="rule">
+  ${ce('kicker','Photo Essay')}
+  ${ce('art-head lg','A View Like No Other')}
+  ${ce('art-byline','By M. Siewney | Photo Correspondent | '+getCity())}
   <div class="grid" style="grid-template-columns:1fr 1fr; flex:1; align-items:stretch;">
-    <div class="gc">${article('','A View Like No Other',L1,L2+' '+L3,'')}</div>
+    <div class="gc"><div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div></div>
     <div class="gc">
-      ${imgBox(155,'Secondary Photo')}
-      ${ce('caption','Early morning mist over the reservoir near the boat launch.')}
-      <div class="art-body" contenteditable="true"><p>${L3}</p><p>${L4}</p></div>
+      <div class="pullquote" contenteditable="true">"There is no landscape on earth quite like the canyon country of Utah at dusk."</div>
+      <div class="art-body" contenteditable="true"><p>${L3}</p></div>
     </div>
   </div>`,
   footer(5)
 ),
 
+// Article VIII — Center Img: single article with photo centered between two text columns
 art8: ()=> wrap(
   header('Science & Environment'),
-  `${ce('banner-head','Four Endangered Species of the Green River')}
-  ${ce('banner-sub','These fish face extinction — and the dam may be their last hope or greatest threat')}
+  `${ce('banner-head','The Endangered Species the Dam Cannot Ignore')}
+  ${ce('banner-sub','Biologists warn that rising reservoir levels may be the final blow for four native fish')}
   <hr class="rule">
+  ${ce('kicker','Environment')}
+  ${ce('art-head lg','A River\'s Last Survivors')}
+  ${ce('art-byline','By Dr. Ellen Marsh | Science Correspondent | '+getCity())}
+  <hr class="rule" style="margin:4px 0;">
   <div class="grid" style="grid-template-columns:1fr 1.3fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${article('sm','The Colorado Pikeminnow',L1,L2,'')}
-      <hr class="rule">
-      ${article('sm','The Razorback Sucker',L2,L3,'')}
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div>
     </div>
     <div class="gc">
-      ${imgBox(230,'Center Featured Species Photo')}
+      ${imgBox(220,'Center Featured Species Photo')}
       ${ce('caption','A razorback sucker surfaces near the dam\'s south gate. Population estimated at under 10,000.')}
       <div class="pullquote" contenteditable="true">"We have ten years to act — maybe less."</div>
-      <div class="art-body" contenteditable="true"><p>${L4}</p></div>
     </div>
     <div class="gc">
-      ${article('sm','The Bonytail Chub',L3,L4,'')}
-      <hr class="rule">
-      ${article('sm','The Humpback Chub',L4,L1,'')}
+      <div class="art-body" contenteditable="true"><p>${L3}</p><p>${L4}</p></div>
     </div>
   </div>`,
   footer(6)
 ),
 
+// Article IX — 4 Column: single long article flowing across four narrow columns
 art9: ()=> wrap(
   header('Analysis'),
   `${ce('banner-head','Dam Economics: Who Benefits, Who Pays')}
   <hr class="rule">
+  ${ce('kicker','Economic Analysis')}
+  ${ce('art-head lg','The Hidden Costs of a Century-Old Bargain')}
+  ${ce('art-byline','By the Investigative Desk | '+getCity())}
+  <hr class="rule" style="margin:4px 0;">
   <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${ce('art-head sm','Power Generation')}
       <div class="art-body" style="font-size:10px;" contenteditable="true"><p>${L1}</p><p>${L2}</p></div>
     </div>
     <div class="gc">
-      ${ce('art-head sm','Water Supply')}
       <div class="art-body" style="font-size:10px;" contenteditable="true"><p>${L2}</p><p>${L3}</p></div>
     </div>
     <div class="gc">
-      ${ce('art-head sm','Recreation & Tourism')}
-      <div class="art-body" style="font-size:10px;" contenteditable="true"><p>${L3}</p><p>${L4}</p></div>
+      <div class="pullquote" contenteditable="true">"The numbers don't lie — but they can be made to mislead."</div>
+      <div class="art-body" style="font-size:10px;" contenteditable="true"><p>${L3}</p></div>
     </div>
     <div class="gc">
-      ${ce('art-head sm','Wildlife Impact')}
       <div class="art-body" style="font-size:10px;" contenteditable="true"><p>${L4}</p><p>${L1}</p></div>
     </div>
-  </div>
-  <hr class="rule-dbl">
-  <div class="grid" style="grid-template-columns:1fr 1fr 1fr 1fr; margin-top:6px;">
-    <div class="gc">${article('sm','Revenue Streams',L1,L2,'')}</div>
-    <div class="gc">${article('sm','Construction Debt',L2,L3,'')}</div>
-    <div class="gc">${article('sm','State Allocations',L3,L4,'')}</div>
-    <div class="gc">${article('sm','Federal Funding',L4,L1,'')}</div>
   </div>
   <div class="black-bar" contenteditable="true">Continued — Full Economic Report: twinriverstimes.com/report</div>`,
   footer(7)
 ),
 
+// Article X — Gallery: single article with multiple photos integrated throughout
 art10: ()=> wrap(
   header('Weekend Magazine'),
   `${ce('banner-head','The Many Faces of Flaming Gorge')}
-  ${ce('banner-sub','Six photographers, six seasons, one of America\'s most dramatic landscapes')}
+  ${ce('banner-sub','One photographer, four seasons, one of America\'s most dramatic landscapes')}
   <hr class="rule">
+  ${ce('kicker','Photo Feature')}
+  ${ce('art-head lg','A Year at the Edge of the Canyon')}
+  ${ce('art-byline','By M. Siewney | Photo Correspondent | '+getCity())}
+  <hr class="rule" style="margin:4px 0;">
   <div class="grid" style="grid-template-columns:1fr 1.4fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${imgBox(150,'Photo 1')}
+      ${imgBox(155,'Photo — Spring')}
       ${ce('caption','Spring runoff, May 2025')}
-      ${imgBox(140,'Photo 2')}
+      ${imgBox(145,'Photo — Summer')}
       ${ce('caption','Summer low water, August 2025')}
-      <div class="art-body" contenteditable="true"><p>${L4}</p></div>
+      <div class="art-body" contenteditable="true"><p>${L1}</p></div>
     </div>
     <div class="gc">
       ${imgBox(240,'Main Feature Photo')}
       ${ce('caption','The dam at golden hour, October 2025. Utah Press Photo of the Year.')}
       <div class="pullquote" contenteditable="true">"There is no landscape on earth quite like the canyon country of Utah at dusk."</div>
-      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p></div>
+      <div class="art-body" contenteditable="true"><p>${L2}</p></div>
     </div>
     <div class="gc">
-      ${imgBox(150,'Photo 3')}
+      ${imgBox(155,'Photo — Autumn')}
       ${ce('caption','Autumn colors, October 2025')}
-      ${imgBox(140,'Photo 4')}
+      ${imgBox(145,'Photo — Winter')}
       ${ce('caption','Winter freeze, January 2026')}
       <div class="art-body" contenteditable="true"><p>${L3}</p></div>
     </div>
@@ -680,36 +706,35 @@ art10: ()=> wrap(
   footer(8)
 ),
 
+// Front Page: single lead story with dominant photo and continued text
 front: ()=> wrap(
   header(),
   `<div style="background:#111;color:#fff;text-align:center;padding:5px;font-family:Arial,sans-serif;font-size:9px;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:5px;" contenteditable="true">★ Late City Final Edition ★ All the News Worth Printing ★</div>
   ${ce('banner-head','Dam Breaks: Town Braces for the Worst')}
   ${ce('banner-sub','Governor declares state of emergency as officials warn of catastrophic flooding downstream')}
   <hr class="rule">
-  <div class="grid" style="grid-template-columns:1.5fr 1fr 1fr; flex:1; align-items:stretch;">
+  ${ce('kicker','Breaking — State of Emergency')}
+  ${ce('art-head lg','Hour by Hour: A Crisis Unfolds at Flaming Gorge')}
+  ${ce('art-byline','By Staff Reporters | '+getCity())}
+  <hr class="rule" style="margin:4px 0;">
+  <div class="grid" style="grid-template-columns:1.5fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${imgBox(205,'Lead Front Page Photo')}
+      ${imgBox(230,'Lead Front Page Photo')}
       ${ce('caption','Water surges over the eastern spillway for the first time in recorded history. Photo: AP, Sunday.')}
       <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p></div>
     </div>
     <div class="gc">
-      ${article('sm','Emergency Declared Statewide',L3,L4,'')}
-      <hr class="rule">
-      ${imgBox(120,'Secondary Photo')}
-      ${ce('caption','Residents evacuate with their belongings on Sunday evening.')}
-      <div class="art-body" contenteditable="true"><p>${L4}</p><p>${L1}</p></div>
-    </div>
-    <div class="gc">
       <div class="pullquote" contenteditable="true">"We have never seen anything like this in 60 years." — Dam Director Carl Webb</div>
-      ${article('sm','What Happens If It Fails',L2,L3,'')}
-      <hr class="rule">
-      ${article('sm','History of Safety Warnings',L3,L4,'')}
+      ${imgBox(130,'Secondary Photo')}
+      ${ce('caption','Residents evacuate with belongings on Sunday evening.')}
+      <div class="art-body" contenteditable="true"><p>${L4}</p><p>${L1}</p><p>${L2}</p></div>
     </div>
   </div>
   <div class="black-bar" contenteditable="true">Continued on Page 2: The Full Story — Hour by Hour Account of the Crisis</div>`,
   footer(2)
 ),
 
+// Comics: single full-page comic strip layout (unchanged — already a single feature)
 comics: ()=>`
   <div class="page-header">
     ${ce('page-edition','Sunday Comics Section')}
@@ -741,25 +766,24 @@ comics: ()=>`
     </div>
   </div>`,
 
+// Opinion: single op-ed article with headshot and pullquote
 opinion: ()=> wrap(
   header('Opinion & Editorial'),
   `${ce('banner-head','Opinion: The Dam We Deserve')}
   ${ce('banner-sub','Decades of deferred maintenance have led us here. Now we must decide what comes next.')}
   <hr class="rule">
-  <div class="grid" style="grid-template-columns:1fr 1fr; flex:1; align-items:stretch;">
+  <div class="grid" style="grid-template-columns:1fr 1.8fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${ce('kicker','Editorial Board')}
-      ${ce('art-head','We Cannot Afford to Wait Any Longer')}
-      ${ce('art-byline','By The Editorial Board | '+getCity())}
-      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p><p>${L4}</p></div>
+      ${imgBox(175,'Columnist Headshot')}
+      ${ce('caption','Dr. Ellen Marsh, Hydrologist, University of Utah')}
+      <div class="pullquote" contenteditable="true">"Infrastructure is the quiet language of civilization."</div>
+      <div style="font-size:8.5px;font-family:Arial;color:#555;margin-top:8px;" contenteditable="true">Dr. Ellen Marsh is a professor of hydrology at the University of Utah. She has advised the Bureau of Reclamation for over 20 years.</div>
     </div>
     <div class="gc">
       ${ce('kicker','Guest Column')}
-      ${ce('art-head','A Dam Is Only as Strong as Our Political Will')}
+      ${ce('art-head lg','A Dam Is Only as Strong as Our Political Will')}
       ${ce('art-byline','By Dr. Ellen Marsh, Hydrologist | University of Utah')}
-      ${imgBox(100,'Columnist Headshot')}
-      <div class="art-body" contenteditable="true"><p>${L4}</p><p>${L1}</p><p>${L2}</p></div>
-      <div class="pullquote" contenteditable="true">"Infrastructure is the quiet language of civilization."</div>
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p><p>${L4}</p></div>
     </div>
   </div>
   <hr class="rule-dbl">
@@ -767,61 +791,50 @@ opinion: ()=> wrap(
   footer(8)
 ),
 
+// Sports: single game story with dominant photo
 sports: ()=> wrap(
   header('Sports'),
   `<div style="background:#8b0000;color:#fff;text-align:center;padding:7px;font-family:'Oswald',sans-serif;font-size:22px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;" contenteditable="true">SPORTS</div>
   ${ce('banner-head','Dam Drillers Win Regional Championship')}
   ${ce('banner-sub','Local team clinches title in overtime thriller before sold-out crowd')}
   <hr class="rule">
+  ${ce('kicker','Championship')}
+  ${ce('art-head lg','Drillers Take It All: A Night No One Will Forget')}
+  ${ce('art-byline','By Staff Sports Reporter | '+getCity())}
+  <hr class="rule" style="margin:4px 0;">
   <div class="grid" style="grid-template-columns:1.4fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${imgBox(205,'Game Action Photo')}
+      ${imgBox(215,'Game Action Photo')}
       ${ce('caption','The Drillers celebrate after clinching the regional title in double overtime. Photo: Staff')}
-      ${article('','Drillers Take It All',L1,L2+' '+L3,'')}
+      <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p></div>
     </div>
     <div class="gc">
       <div class="pullquote" contenteditable="true">"This team never quit. Never. That\'s the dam spirit." — Head Coach Bill Hoover</div>
-      ${article('sm','Season Statistics',L3,L4,'')}
-      <hr class="rule">
-      ${article('sm','Road to the Championship',L4,L1,'')}
-      ${imgBox(105,'Coach Photo')}
+      ${imgBox(120,'Coach Photo')}
       ${ce('caption','Head Coach Bill Hoover addresses the team after the win.')}
+      <div class="art-body" contenteditable="true"><p>${L4}</p><p>${L1}</p></div>
     </div>
   </div>`,
   footer(9)
 ),
 
+// Obituary: single full obituary with portrait photo
 obituary: ()=> wrap(
   header('Obituaries'),
   `${ce('banner-head','In Memoriam')}
   <hr class="rule">
   <div class="grid" style="grid-template-columns:0.65fr 1fr; flex:1; align-items:stretch;">
     <div class="gc">
-      ${imgBox(200,'Portrait Photograph')}
-      ${ce('caption','1942 – 2026')}
+      ${imgBox(215,'Portrait Photograph')}
+      ${ce('caption','Harold R. Finch, 1942 – 2026')}
       <div class="pullquote" contenteditable="true">"He gave his life to these waters, and these waters gave life to all of us."</div>
-      <div class="art-body" contenteditable="true"><p>${L3}</p></div>
+      <div style="font-size:8.5px;font-family:Arial;color:#555;margin-top:8px;line-height:1.5;" contenteditable="true">Memorial service: Saturday, April 19, 2026 at 2:00 p.m. — First Presbyterian Church, Flaming Gorge. Reception to follow. In lieu of flowers, donations to the Green River Conservation Fund.</div>
     </div>
     <div class="gc">
       ${ce('kicker','Obituary')}
       ${ce('art-head lg','Harold R. Finch, 85, Dam Engineer Who Shaped the West')}
       ${ce('art-byline','Staff Report | '+getCity())}
       <div class="art-body" contenteditable="true"><p>${L1}</p><p>${L2}</p><p>${L3}</p><p>${L4}</p></div>
-    </div>
-  </div>
-  <hr class="rule">
-  <div class="grid" style="grid-template-columns:1fr 1fr 1fr; margin-top:6px;">
-    <div class="gc">
-      ${ce('art-head sm','Margaret "Peggy" Stone, 72')}
-      <div class="art-body" style="font-size:9.5px;" contenteditable="true"><p>${L2.slice(0,240)}</p></div>
-    </div>
-    <div class="gc">
-      ${ce('art-head sm','Walter J. Goss, 90')}
-      <div class="art-body" style="font-size:9.5px;" contenteditable="true"><p>${L3.slice(0,240)}</p></div>
-    </div>
-    <div class="gc">
-      ${ce('art-head sm','Ruth A. Blaine, 68')}
-      <div class="art-body" style="font-size:9.5px;" contenteditable="true"><p>${L4.slice(0,240)}</p></div>
     </div>
   </div>`,
   footer(10)
