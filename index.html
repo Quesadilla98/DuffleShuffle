@@ -123,8 +123,8 @@ body {
 
 /* ── PAGE ── */
 .page {
-  width: 816px;
-  height: 1056px;
+  width: 900px;
+  height: 1200px;
   background: var(--paper);
   color: var(--ink);
   font-family: 'EB Garamond', Georgia, serif;
@@ -251,17 +251,87 @@ body {
 [contenteditable="true"] { white-space: normal; word-spacing: normal; }
 [contenteditable="true"]:focus { outline: 1.5px dashed rgba(180,140,0,0.6); outline-offset: 1px; border-radius: 1px; }
 
-/* Print */
-@media print {
-  body { background: white !important; display: block; height: auto; overflow: auto; }
-  .sidebar, .toolbar { display: none !important; }
-  .canvas-wrap { background: white !important; padding: 0 !important; display: flex; justify-content: center; align-items: flex-start; }
-  .page { box-shadow: none !important; width: 7.5in !important; min-height: 10in !important; margin: 0 auto; padding: 0.4in 0.5in; }
-  @page { size: 8.5in 11in; margin: 0.5in; }
+/* Photo placement mode */
+body.placing-photo .canvas-wrap { cursor: crosshair; }
+body.placing-photo #btn-add-photo { background: var(--active-tpl); color: #111; border-color: var(--active-tpl); }
+.place-hint {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+  background: #111; color: #fff; font-family: Arial, sans-serif; font-size: 11px;
+  padding: 6px 16px; border-radius: 20px; pointer-events: none; z-index: 9999;
+  opacity: 0; transition: opacity 0.15s;
 }
+body.placing-photo .place-hint { opacity: 1; }
+
+/* Placed photo boxes */
+.placed-photo {
+  position: absolute;
+  border: 1.5px solid #999;
+  background: #d5cfc0;
+  overflow: visible;
+  cursor: move;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  z-index: 10;
+}
+.placed-photo .ph-inner {
+  width: 100%; height: 100%; overflow: hidden; position: relative;
+}
+.placed-photo img { width: 100%; height: 100%; object-fit: cover; display: block; pointer-events: none; }
+.placed-photo .ph-hint {
+  width: 100%; height: 100%; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  font-size: 9px; color: #777; font-family: Arial, sans-serif; text-align: center;
+  gap: 4px; pointer-events: none;
+}
+.placed-photo .ph-upload {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.placed-photo .ph-controls {
+  position: absolute; top: -26px; right: 0; display: flex; gap: 3px;
+  opacity: 0; transition: opacity 0.15s; z-index: 20;
+}
+.placed-photo:hover .ph-controls { opacity: 1; }
+.ph-btn {
+  background: rgba(30,30,30,0.85); color: #fff; border: none; border-radius: 3px;
+  font-size: 10px; padding: 2px 7px; cursor: pointer; font-family: Arial, sans-serif; line-height: 1.6; white-space: nowrap;
+}
+.ph-btn:hover { background: #000; }
+.ph-resize {
+  position: absolute; bottom: -8px; right: -8px;
+  width: 16px; height: 16px; cursor: se-resize;
+  background: #555; border-radius: 50%;
+  z-index: 20; border: 2px solid #ccc;
+}
+#page { position: relative; }
+
+/* Export overlay */
+#export-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65);
+  z-index: 99999; align-items: center; justify-content: center; flex-direction: column; gap: 14px;
+}
+#export-overlay.active { display: flex; }
+#export-overlay .exp-box {
+  background: #222; color: #eee; font-family: Arial, sans-serif; font-size: 13px;
+  padding: 28px 40px; border-radius: 8px; text-align: center; min-width: 260px;
+}
+#export-overlay .exp-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; color: var(--active-tpl); }
+#export-overlay .exp-bar-wrap { background: #444; border-radius: 4px; height: 6px; margin-top: 12px; overflow: hidden; }
+#export-overlay .exp-bar { background: var(--active-tpl); height: 100%; width: 0%; transition: width 0.3s; border-radius: 4px; }
 </style>
 </head>
 <body>
+
+<div class="place-hint">Click anywhere on the page to place the photo box — press Esc to cancel</div>
+
+<div id="export-overlay">
+  <div class="exp-box">
+    <div class="exp-title">Exporting your newspaper...</div>
+    <div id="exp-status">Preparing...</div>
+    <div class="exp-bar-wrap"><div class="exp-bar" id="exp-bar"></div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <!-- SIDEBAR -->
 <div class="sidebar">
@@ -350,9 +420,11 @@ body {
     <div class="tb-sep"></div>
     <label>Edition</label>
     <input id="i-ed" value="Vol. 1  No. 1" style="width:90px;" oninput="updateField('.meta-ed',this.value)">
+    <div class="tb-sep"></div>
+    <button class="btn-action" id="btn-add-photo" onclick="startPhotoPlace()" title="Click then click on the page to place a photo box">📷 Add Photo</button>
     <div class="toolbar-right">
       <button class="btn-action" onclick="document.execCommand('undo')">↩ Undo</button>
-      <button class="btn-action primary" onclick="window.print()">🖨 Print / Save PDF</button>
+      <button class="btn-action primary" id="btn-export" onclick="exportBothSizes()">&#11015; Export (9&times;12 &amp; 12&times;18)</button>
     </div>
   </div>
 
@@ -881,6 +953,242 @@ function load(name, btn) {
 }
 
 load('art1', document.querySelector('.tpl-btn'));
+
+/* ── PLACE PHOTO ── */
+let placingPhoto = false;
+
+function startPhotoPlace() {
+  placingPhoto = !placingPhoto;
+  document.body.classList.toggle('placing-photo', placingPhoto);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && placingPhoto) {
+    placingPhoto = false;
+    document.body.classList.remove('placing-photo');
+  }
+});
+
+document.querySelector('.canvas-wrap').addEventListener('click', function(e) {
+  if (!placingPhoto) return;
+  const page = document.getElementById('page');
+  const pageRect = page.getBoundingClientRect();
+  const x = e.clientX - pageRect.left;
+  const y = e.clientY - pageRect.top;
+  if (x < 0 || y < 0 || x > pageRect.width || y > pageRect.height) return;
+  e.stopPropagation();
+  placingPhoto = false;
+  document.body.classList.remove('placing-photo');
+  createPlacedPhoto(Math.round(x - 80), Math.round(y - 60), 160, 120);
+});
+
+function createPlacedPhoto(x, y, w, h) {
+  const page = document.getElementById('page');
+  const box = document.createElement('div');
+  box.className = 'placed-photo';
+  box.style.cssText = 'left:' + x + 'px; top:' + y + 'px; width:' + w + 'px; height:' + h + 'px;';
+  box.innerHTML =
+    '<div class="ph-controls">' +
+      '<button class="ph-btn" onclick="triggerUpload(this)">&#128247; Upload</button>' +
+      '<button class="ph-btn" onclick="removePhoto(this)">&#x2715; Remove</button>' +
+    '</div>' +
+    '<div class="ph-inner">' +
+      '<div class="ph-hint">' +
+        '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>' +
+        'Click to upload' +
+      '</div>' +
+      '<input class="ph-upload" type="file" accept="image/*" onchange="loadPlacedImg(event,this)">' +
+    '</div>' +
+    '<div class="ph-resize"></div>';
+  page.appendChild(box);
+  box.querySelector('.ph-inner').addEventListener('click', function(e) {
+    if (e.target.classList.contains('ph-resize')) return;
+    box.querySelector('.ph-upload').click();
+  });
+  makeDraggable(box);
+  makeResizable(box);
+}
+
+function triggerUpload(btn) {
+  btn.closest('.placed-photo').querySelector('.ph-upload').click();
+}
+
+function removePhoto(btn) {
+  btn.closest('.placed-photo').remove();
+}
+
+function loadPlacedImg(ev, input) {
+  const file = ev.target.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = function(e2) {
+    const inner = input.closest('.ph-inner');
+    const hint = inner.querySelector('.ph-hint');
+    if (hint) hint.style.display = 'none';
+    let img = inner.querySelector('img');
+    if (!img) { img = document.createElement('img'); inner.insertBefore(img, input); }
+    img.src = e2.target.result;
+  };
+  r.readAsDataURL(file);
+}
+
+function makeDraggable(el) {
+  var ox, oy, startX, startY, dragging = false;
+  el.addEventListener('mousedown', function(e) {
+    if (e.target.classList.contains('ph-resize') ||
+        e.target.classList.contains('ph-upload') ||
+        e.target.classList.contains('ph-btn')) return;
+    dragging = true;
+    startX = e.clientX; startY = e.clientY;
+    ox = el.offsetLeft; oy = el.offsetTop;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!dragging) return;
+    var page = document.getElementById('page');
+    var pr = page.getBoundingClientRect();
+    var nx = ox + (e.clientX - startX);
+    var ny = oy + (e.clientY - startY);
+    nx = Math.max(0, Math.min(nx, pr.width - el.offsetWidth));
+    ny = Math.max(0, Math.min(ny, pr.height - el.offsetHeight));
+    el.style.left = nx + 'px';
+    el.style.top  = ny + 'px';
+  });
+  document.addEventListener('mouseup', function() { dragging = false; });
+}
+
+function makeResizable(el) {
+  var handle = el.querySelector('.ph-resize');
+  var startX, startY, startW, startH, resizing = false;
+  handle.addEventListener('mousedown', function(e) {
+    resizing = true;
+    startX = e.clientX; startY = e.clientY;
+    startW = el.offsetWidth; startH = el.offsetHeight;
+    e.preventDefault(); e.stopPropagation();
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (!resizing) return;
+    var nw = Math.max(80, startW + (e.clientX - startX));
+    var nh = Math.max(60, startH + (e.clientY - startY));
+    el.style.width  = nw + 'px';
+    el.style.height = nh + 'px';
+  });
+  document.addEventListener('mouseup', function() { resizing = false; });
+}
+
+
+/* ── EXPORT BOTH SIZES ── */
+// Editor canvas: 900x1200px = exact 9x12in at 100px/in (3:4 ratio)
+// 9x12  export @ 150dpi = 1350x1800px (scale 1.5, same 3:4 ratio)
+// 12x18 export @ 150dpi = 1800x2700px (scale 2.0, content=1800x2400, 150px white margin top+bottom)
+
+async function exportBothSizes() {
+  const overlay = document.getElementById('export-overlay');
+  const bar     = document.getElementById('exp-bar');
+  const status  = document.getElementById('exp-status');
+  overlay.classList.add('active');
+
+  const page = document.getElementById('page');
+
+  function setProgress(pct, msg) {
+    bar.style.width = pct + '%';
+    status.textContent = msg;
+  }
+
+  // Editor is exactly 9x12 (3:4) at 900x1200px.
+  // 9x12  @ 150dpi = 1350x1800px  (scale 1.5  — same 3:4 ratio, fills perfectly)
+  // 12x18 @ 150dpi = 1800x2700px  (scale 2.0  — content = 1800x2400, centered on 2700px tall canvas)
+
+  // Capture the page at native 900x1200, then draw it scaled onto output canvases.
+  // This avoids all viewport/scroll offset issues and guarantees the full page is captured.
+  async function captureNative() {
+    // Clone page into a fixed 0,0 offscreen div so html2canvas has no offset
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:fixed;left:0;top:0;width:900px;height:1200px;z-index:-9999;pointer-events:none;overflow:visible;';
+    const clone = page.cloneNode(true);
+    clone.style.cssText = 'position:absolute;left:0;top:0;width:900px;height:1200px;margin:0;padding:36px 44px 36px;box-shadow:none;overflow:visible;';
+    wrap.appendChild(clone);
+    document.body.appendChild(wrap);
+
+    const result = await html2canvas(clone, {
+      scale: 1,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#f9f6ef',
+      width: 900,
+      height: 1200,
+      windowWidth: 900,
+      windowHeight: 1200,
+      scrollX: 0,
+      scrollY: 0,
+      x: 0,
+      y: 0
+    });
+
+    document.body.removeChild(wrap);
+    return result; // 900x1200 canvas
+  }
+
+  function scaleAndCenter(src, outW, outH) {
+    // src is always 900x1200. Scale it to fill outW, center vertically.
+    const scale = outW / 900;
+    const dstW  = outW;
+    const dstH  = Math.round(1200 * scale);
+    const offX  = 0;
+    const offY  = Math.round((outH - dstH) / 2);
+
+    const out = document.createElement('canvas');
+    out.width  = outW;
+    out.height = outH;
+    const ctx = out.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, outW, outH);
+    ctx.drawImage(src, 0, 0, 900, 1200, offX, offY, dstW, dstH);
+    return out;
+  }
+
+  try {
+    setProgress(10, 'Capturing page...');
+    const native = await captureNative(); // 900x1200
+
+    // 9x12 @ 150dpi = 1350x1800 (scale 1.5 — same 3:4, fills perfectly, offY=0)
+    setProgress(55, 'Building 9×12...');
+    const canvas9x12  = scaleAndCenter(native, 1350, 1800);
+
+    // 12x18 @ 150dpi = 1800x2700 (scale 2.0 — content = 1800x2400, 150px margin top+bottom)
+    setProgress(75, 'Building 12×18...');
+    const canvas12x18 = scaleAndCenter(native, 1800, 2700);
+
+    setProgress(88, 'Building ZIP...');
+
+    const blob9x12  = await new Promise(res => canvas9x12.toBlob(res,  'image/png'));
+    const blob12x18 = await new Promise(res => canvas12x18.toBlob(res, 'image/png'));
+
+    const zip = new JSZip();
+    const masthead = (document.querySelector('.page-masthead') || {}).textContent || 'newspaper';
+    const safe = masthead.replace(/[^a-z0-9]/gi, '_').slice(0, 30);
+    zip.file(safe + '_9x12.png',  blob9x12);
+    zip.file(safe + '_12x18.png', blob12x18);
+
+    setProgress(96, 'Downloading...');
+    const zipBlob = await zip.generateAsync({ type: 'blob' });
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(zipBlob);
+    a.download = safe + '_export.zip';
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+
+    setProgress(100, 'Done!');
+    setTimeout(() => { overlay.classList.remove('active'); bar.style.width = '0%'; }, 1200);
+
+  } catch(err) {
+    status.textContent = 'Error: ' + err.message;
+    bar.style.background = '#c00';
+    setTimeout(() => { overlay.classList.remove('active'); bar.style.background = ''; bar.style.width = '0%'; }, 3000);
+  }
+}
+
 </script>
 </body>
 </html>
