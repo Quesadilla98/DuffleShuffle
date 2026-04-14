@@ -1106,7 +1106,7 @@ async function exportBothSizes() {
     document.body.appendChild(wrap);
 
     const result = await html2canvas(clone, {
-      scale: 1,
+      scale: 4,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
@@ -1145,7 +1145,7 @@ async function exportBothSizes() {
     wrap.style.height = fullH + 'px';
 
     const result = await html2canvas(clone, {
-      scale: 1,
+      scale: 4,
       useCORS: true,
       allowTaint: true,
       backgroundColor: '#ffffff',
@@ -1178,14 +1178,16 @@ async function exportBothSizes() {
     setProgress(10, 'Capturing condensed page (9×12)...');
     const condensed = await captureCondensed();
 
-    setProgress(42, 'Building 9×12 export...');
-    const canvas9x12 = scaleFill(condensed, 1350, 1800);
+    setProgress(42, 'Building 9×12 @ 300dpi export...');
+    // 9×12 @ 300dpi = 2700×3600
+    const canvas9x12 = scaleFill(condensed, 2700, 3600);
 
     setProgress(58, 'Capturing full page (12×18)...');
     const full = await captureFull();
 
-    setProgress(78, 'Building 12×18 export...');
-    const canvas12x18 = scaleFill(full, 1800, 2700);
+    setProgress(78, 'Building 12×18 @ 300dpi export...');
+    // 12×18 @ 300dpi = 3600×5400
+    const canvas12x18 = scaleFill(full, 3600, 5400);
 
     setProgress(88, 'Building ZIP...');
 
