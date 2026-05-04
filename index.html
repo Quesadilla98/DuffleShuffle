@@ -1469,7 +1469,6 @@ function exportPDF() {
     });
 
     medPage = `
-      <div class="page-break"></div>
       <div class="pdf-page med-page" style="${c?'border:8px solid '+c.main+';':'' }">
         ${c ? `<div class="crew-corner-strip" style="background:${c.main};"></div>` : ''}
         <div class="pdf-header" style="${c?'background:'+c.main+';':'background:#3d2e1a;'}">
@@ -1488,6 +1487,50 @@ function exportPDF() {
         <div class="med-notice">All medications must be in the original prescription bottle at time of check-in.</div>
 
         ${medCards}
+
+        <div class="admin-log-section">
+          <div class="admin-log-title"><span>📋</span> Medication Administration Log</div>
+          <table class="admin-log-table">
+            <thead>
+              <tr>
+                <th class="col-med" rowspan="2">Medication<br><span style="font-size:7px;font-weight:normal;font-style:italic;opacity:.8;">circle one per row</span></th>
+                <th rowspan="2">Date</th>
+                <th rowspan="2">Student<br>Initials</th>
+                <th rowspan="2"># Administered</th>
+                <th rowspan="2"># Remaining</th>
+                <th rowspan="2">Staff<br>Initials</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${(() => {
+                let rows = '';
+                const LOG_ROWS = 8; // blank log rows per medication
+                meds.forEach((m, mi) => {
+                  const medLabel = m.name || '(unnamed)';
+                  // First row: medication name spanning, then blank data cols
+                  for (let r = 0; r < LOG_ROWS; r++) {
+                    if (r === 0) {
+                      rows += `<tr class="data-row">
+                        <td class="med-name-cell" rowspan="${LOG_ROWS}" style="border-right:2px solid #3d2e1a;vertical-align:top;padding-top:6px;">
+                          <div style="font-size:10px;font-weight:900;color:#1a1a1a;margin-bottom:4px;">${medLabel}</div>
+                          <div style="font-size:8px;font-style:italic;color:#888;">circle one ↓</div>
+                        </td>
+                        <td></td><td></td><td></td><td></td><td></td>
+                      </tr>`;
+                    } else {
+                      rows += `<tr class="data-row"><td></td><td></td><td></td><td></td><td></td></tr>`;
+                    }
+                  }
+                  // spacer row between medications
+                  if (mi < meds.length - 1) {
+                    rows += `<tr><td colspan="6" style="background:#e8e0d0;height:6px;border:1px solid #c8bfaa;"></td></tr>`;
+                  }
+                });
+                return rows;
+              })()}
+            </tbody>
+          </table>
+        </div>
 
         <div class="sig-row">
           <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Staff receiving medications</div></div>
@@ -1663,6 +1706,43 @@ function exportPDF() {
 
   .footnote { font-size:8px; color:#aaa; padding:0 20px 12px; font-style:italic; }
 
+  /* MEDICATION ADMINISTRATION LOG TABLE */
+  .admin-log-section { margin: 14px 20px 10px; page-break-inside: avoid; }
+  .admin-log-title {
+    font-size: 9px; font-weight: bold; letter-spacing: .1em; text-transform: uppercase;
+    color: #3d2e1a; margin-bottom: 6px; padding-bottom: 4px;
+    border-bottom: 2px solid #3d2e1a; display: flex; align-items: center; gap: 6px;
+  }
+  .admin-log-title span { font-size: 12px; }
+  .admin-log-table { width: 100%; border-collapse: collapse; font-size: 10px; }
+  .admin-log-table th {
+    background: #3d2e1a; color: #f5f0e8;
+    padding: 6px 8px; font-size: 8px; font-weight: bold;
+    letter-spacing: .07em; text-transform: uppercase; text-align: center;
+    border: 1px solid #3d2e1a;
+  }
+  .admin-log-table th.col-med { text-align: left; }
+  .admin-log-table td {
+    border: 1px solid #c8bfaa; padding: 0; height: 26px;
+    text-align: center; vertical-align: middle;
+  }
+  .admin-log-table td.med-name-cell {
+    text-align: left; padding: 5px 8px; font-size: 9px;
+    font-weight: bold; color: #1a1a1a; background: #fafaf8;
+    min-width: 120px;
+  }
+  .admin-log-table td.circle-one-cell {
+    text-align: left; padding: 4px 8px; font-size: 8px; color: #444;
+    font-style: italic; background: #fafaf8; vertical-align: top; padding-top: 5px;
+  }
+  .admin-log-table tr.med-name-row td { background: #f5f2ed; }
+  .admin-log-table tr.data-row td { background: #fff; }
+  .admin-log-table tr.data-row:nth-child(even) td { background: #fafaf8; }
+  .admin-log-table .circle-one-hint {
+    font-size: 7px; color: #888; font-style: italic; letter-spacing: .03em;
+    display: block; margin-top: 1px;
+  }
+
   /* PAGE BREAK */
   .page-break { page-break-before:always; break-before:page; }
 
@@ -1777,33 +1857,28 @@ function exportPDF() {
 
   ${medSummarySection}
 
-  <div class="section-head" style="color:#b91c1c;">Prohibited Items — Student Declaration</div>
+  ${prohibFoundFlags.some(f=>f) ? `
+  <div class="section-head" style="color:#b91c1c;">Prohibited Items — Found &amp; Confiscated</div>
   <div style="margin:0 20px 14px;padding:14px;background:#fef2f2;border:2px solid #b91c1c;border-radius:8px;page-break-inside:avoid;">
     <div style="font-size:9px;font-weight:bold;color:#7f1d1d;letter-spacing:.05em;text-transform:uppercase;margin-bottom:10px;">
-      ⊘ &nbsp; Student confirmed they did not bring any of the following:
+      ⚠ &nbsp; The following prohibited items were found and confiscated:
     </div>
     ${PROHIBITED.map((p,i)=>{
       const found = prohibFoundFlags[i];
-      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #fca5a5;${found?'background:#fff0f0;margin:0 -4px;padding:5px 4px;border-radius:4px;':''}">
-        <span style="color:${found?'#b91c1c':'#2d6a2d'};font-size:13px;font-weight:900;">${found?'⚠':'☑'}</span>
+      if (!found) return '';
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 4px;border-bottom:1px solid #fca5a5;background:#fff0f0;margin:0 -4px;border-radius:4px;">
+        <span style="color:#b91c1c;font-size:13px;font-weight:900;">⚠</span>
         <div style="flex:1;">
-          <div style="font-size:10px;font-weight:bold;color:${found?'#7f1d1d':'#1a1a1a'};">${p.main}${found?' — <span style="color:#b91c1c;">FOUND &amp; CONFISCATED</span>':''}</div>
+          <div style="font-size:10px;font-weight:bold;color:#7f1d1d;">${p.main} — <span style="color:#b91c1c;">FOUND &amp; CONFISCATED</span></div>
           <div style="font-size:8px;color:#888;">${p.desc}</div>
         </div>
       </div>`;
     }).join('')}
-    ${prohibFoundFlags.some(f=>f) ? `
-    <div style="margin-top:10px;padding:8px 10px;background:#7f1d1d;border-radius:6px;">
-      <div style="font-size:9px;font-weight:bold;color:#fff;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;">⚠ Items Found &amp; Confiscated</div>
-      ${PROHIBITED.filter((_,i)=>prohibFoundFlags[i]).map(p=>`<div style="font-size:10px;color:#fca5a5;padding:2px 0;">• ${p.main}</div>`).join('')}
-      
-    </div>` : `
-    <div style="margin-top:8px;font-size:9px;color:#2d6a2d;font-weight:bold;">✓ No prohibited items found during check</div>`}
     <div style="margin-top:12px;display:flex;gap:40px;">
       <div style="flex:1;"><div style="border-bottom:1px solid #b91c1c;height:20px;"></div><div style="font-size:8px;color:#b91c1c;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Student signature</div></div>
       <div style="flex:1;"><div style="border-bottom:1px solid #b91c1c;height:20px;"></div><div style="font-size:8px;color:#b91c1c;text-transform:uppercase;letter-spacing:.06em;margin-top:3px;">Date</div></div>
     </div>
-  </div>
+  </div>` : ''}
 
   <div class="sig-row">
     <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Crew Lead</div></div>
