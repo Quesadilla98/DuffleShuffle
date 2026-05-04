@@ -1493,49 +1493,30 @@ function exportPDF() {
           <table class="admin-log-table">
             <thead>
               <tr>
-                <th class="col-med" rowspan="2">Medication<br><span style="font-size:7px;font-weight:normal;font-style:italic;opacity:.8;">circle one per row</span></th>
-                <th rowspan="2">Date</th>
-                <th rowspan="2">Student<br>Initials</th>
-                <th rowspan="2"># Administered</th>
-                <th rowspan="2"># Remaining</th>
-                <th rowspan="2">Staff<br>Initials</th>
+                <th class="col-med">Medication<br><span style="font-size:7px;font-weight:normal;font-style:italic;opacity:.8;">circle one</span></th>
+                <th>Date</th>
+                <th>Student<br>Initials</th>
+                <th># Administered</th>
+                <th># Remaining</th>
+                <th>Staff<br>Initials</th>
               </tr>
             </thead>
             <tbody>
               ${(() => {
+                const LOG_ROWS = 32;
+                const medCell = `<td class="med-name-cell" style="border-right:2px solid #3d2e1a;">
+                  ${meds.map((m,i) => `<span style="font-size:9px;font-weight:700;color:#1a1a1a;">${m.name||'(unnamed)'}</span>`).join('<span style="color:#aaa;font-size:9px;margin:0 4px;">/</span>')}
+                </td>`;
                 let rows = '';
-                const LOG_ROWS = 8; // blank log rows per medication
-                meds.forEach((m, mi) => {
-                  const medLabel = m.name || '(unnamed)';
-                  // First row: medication name spanning, then blank data cols
-                  for (let r = 0; r < LOG_ROWS; r++) {
-                    if (r === 0) {
-                      rows += `<tr class="data-row">
-                        <td class="med-name-cell" rowspan="${LOG_ROWS}" style="border-right:2px solid #3d2e1a;vertical-align:top;padding-top:6px;">
-                          <div style="font-size:10px;font-weight:900;color:#1a1a1a;margin-bottom:4px;">${medLabel}</div>
-                          <div style="font-size:8px;font-style:italic;color:#888;">circle one ↓</div>
-                        </td>
-                        <td></td><td></td><td></td><td></td><td></td>
-                      </tr>`;
-                    } else {
-                      rows += `<tr class="data-row"><td></td><td></td><td></td><td></td><td></td></tr>`;
-                    }
-                  }
-                  // spacer row between medications
-                  if (mi < meds.length - 1) {
-                    rows += `<tr><td colspan="6" style="background:#e8e0d0;height:6px;border:1px solid #c8bfaa;"></td></tr>`;
-                  }
-                });
+                for (let r = 0; r < LOG_ROWS; r++) {
+                  rows += `<tr class="data-row">${medCell}<td></td><td></td><td></td><td></td><td></td></tr>`;
+                }
                 return rows;
               })()}
             </tbody>
           </table>
         </div>
 
-        <div class="sig-row">
-          <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Staff receiving medications</div></div>
-          <div class="sig-block"><div class="sig-line"></div><div class="sig-label">Student / Parent / Guardian</div></div>
-        </div>
       </div>`;
   }
 
@@ -1555,8 +1536,9 @@ function exportPDF() {
     position: relative;
     ${c ? 'border: 8px solid '+c.main+';' : 'border: 3px solid #3d2e1a;'}
     margin-bottom: 0;
-    overflow: hidden;
+    overflow: visible;
   }
+  .med-page { overflow: visible; }
 
   /* thick color bars on left and right edges */
   .side-bar-left, .side-bar-right {
@@ -1792,8 +1774,10 @@ function exportPDF() {
     html, body { margin:0; padding:0; }
     .side-bar-left, .side-bar-right { position:fixed; }
     .pdf-page { border-width: ${c ? '8px' : '3px'}; page-break-after:always; break-after:page; }
+    .pdf-page.med-page { page-break-after:auto; break-after:auto; }
     .pdf-page:last-child { page-break-after:auto; break-after:auto; }
     .page-break { page-break-before:always; break-before:page; }
+    .admin-log-table thead { display:table-header-group; }
   }
 </style>
 </head>
